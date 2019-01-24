@@ -76,8 +76,9 @@ int main(int argc, char **argv)
 		//...................................
 
 		//fill with your code
-	        ROS_INFO("Position: (%f, %f) Orientation: %f rad or %f degrees.", posX, posY, yaw, yaw*180/pi);
-        	//ROS_INFO("Laser Range: %i", laserRange);
+	        //ROS_INFO("Position: (%f, %f) Orientation: %f rad or %f degrees.", posX, posY, yaw, yaw*180/pi);
+        	ROS_INFO("Size of laser scan array: %i and size of offset: %i", laserSize, laserOffset);
+		//ROS_INFO("Laser Range: %i", laserRange);
 
   		vel.angular.z = angular;
   		vel.linear.x = linear;
