@@ -40,10 +40,17 @@ void bumperCallback(const kobuki_msgs::BumperEvent::ConstPtr msg){
 }
 
 //-----Laser Variables-----//
+double laserRange = 10.0;
+int laserSize = 0;
+int laserOffset = 0;
+int desiredAngle = 5;
 
 
 void laserCallback(const sensor_msgs::LaserScan::ConstPtr& msg){
-	//fill with your code
+	laserSize = (msg->angle_max - msg->angle_min)/(msg->angle_increment);
+	laserOffset = desiredAngle*pi/(180.0*msg->angle_increment);
+
+	ROS_INFO("Size of laser scan array: %i and size of offset: %i", laserSize, laserOffset);
 }
 
 int main(int argc, char **argv)
