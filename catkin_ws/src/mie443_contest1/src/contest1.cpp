@@ -43,14 +43,35 @@ void bumperCallback(const kobuki_msgs::BumperEvent::ConstPtr msg){
 double laserRange = 10.0;
 int laserSize = 0;
 int laserOffset = 0;
-int desiredAngle = 5;
+double desiredAngle = 10.0;
+double desiredAngleRad = desiredAngle*pi/180.0;
 
 
 void laserCallback(const sensor_msgs::LaserScan::ConstPtr& msg){
 	laserSize = (msg->angle_max - msg->angle_min)/(msg->angle_increment);
-	laserOffset = desiredAngle*pi/(180.0*msg->angle_increment);
+	laserOffset = desiredAngleRad/(msg->angle_increment);
+	laserRange = 11.0;
 
-	ROS_INFO("Size of laser scan array: %i and size of offset: %i", laserSize, laserOffset);
+	if(desiredAngleRad < msg->angle_max && -desiredAngleRad > msg->angle_min){
+		for(int i = laserSize/2 - laserOffset; i < laserSize/2 + laserOffset; i++){
+			if(laserRange > msg->ranges[i]){
+				laserRange = msg->ranges[i];
+			}
+		}
+	}
+	else{
+		for(int i = 0; i < laserSize; i++){
+			if(laserRange > msg->ranges[i]){
+				laserRange = msg->ranges[i];
+			}
+		}
+	}
+
+	if(laserRange == 11)
+		laserRange = 0;
+	
+	ROS_INFO("Range of laser is: %lf", laserRange);
+	//ROS_INFO("Size of laser scan array: %i and size of offset: %i", laserSize, laserOffset);
 }
 
 int main(int argc, char **argv)
