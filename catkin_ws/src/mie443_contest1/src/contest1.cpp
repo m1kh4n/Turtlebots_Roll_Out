@@ -91,7 +91,7 @@ void moveForward(float speed, int safety){
 			linear = maxSpeed;
 	}
 	else if (safety == 1){
-		if (laserRange == 0)
+		if (laserRange < 0.45)
 			linear = 0;
 		if (laserRange < 1)
 			linear = 0.1;
