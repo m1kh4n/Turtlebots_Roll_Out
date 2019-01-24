@@ -82,7 +82,12 @@ double linear = 0.0;
 double maxSpeed = 0.25;
 int safety = 1;
 
-void moveForward(float speed, int safety){
+void stop(){
+	linear = 0;
+	angular = 0;
+}
+
+void moveFoward(float speed, int safety){
 	angular = 0;
 	if (safety == 0){
 		if(speed < maxSpeed)
@@ -93,7 +98,7 @@ void moveForward(float speed, int safety){
 	else if (safety == 1){
 		if (laserRange < 0.45)
 			linear = 0;
-		if (laserRange < 1)
+		else if (laserRange < 1)
 			linear = 0.1;
 		else if(speed < maxSpeed)
 			linear = speed;
@@ -101,6 +106,11 @@ void moveForward(float speed, int safety){
 			linear = maxSpeed;
 	}
 	ROS_INFO("Robot moving forward with speed of: %lf.", linear); 
+}
+
+void moveBackwards(){
+	angular = 0;
+	linear = -0.1;
 }
 
 void rotate(float angle){
