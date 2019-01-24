@@ -87,7 +87,7 @@ void stop(){
 	angular = 0;
 }
 
-void moveFoward(float speed, int safety){
+void moveForward(float speed, int safety){
 	angular = 0;
 	if (safety == 0){
 		if(speed < maxSpeed)
