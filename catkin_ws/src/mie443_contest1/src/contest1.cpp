@@ -10,8 +10,18 @@
 
 using namespace std;
 
-void bumperCallback(const kobuki_msgs::BumperEvent::ConstPtr& msg){
-	//fill with your code
+//-----Bumper Variables-----//
+bool bumperLeft = 0;
+bool bumperRight = 0;
+bool bumperCentre = 0;
+
+void bumperCallback(const kobuki_msgs::BumperEvent::ConstPtr msg){
+	if(msg.bumper == 0)
+		bumperLeft = !bumperLeft;
+	else if(msg.bumper == 1)
+		bumperCentre = !bumperCentre;
+	else if(msg.bumper == 2)
+		bumperRight = !bumperRight;
 }
 
 void laserCallback(const sensor_msgs::LaserScan::ConstPtr& msg){

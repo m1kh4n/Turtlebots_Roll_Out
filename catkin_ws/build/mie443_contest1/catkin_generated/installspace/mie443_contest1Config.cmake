@@ -129,7 +129,7 @@ foreach(library ${libraries})
     set(lib_path "")
     set(lib "${library}-NOTFOUND")
     # since the path where the library is found is returned we have to iterate over the paths manually
-    foreach(path /home/albertliu/Turtlebots_Roll_Out/catkin_ws/install/lib;/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib;/home/albertliu/catkin_ws_tutorial/devel/lib;/home/albertliu/catkin_ws/devel/lib;/opt/ros/kinetic/lib)
+    foreach(path /home/albertliu/Turtlebots_Roll_Out/catkin_ws/install/lib;/home/albertliu/catkin_ws_tutorial/devel/lib;/home/albertliu/catkin_ws/devel/lib;/opt/ros/kinetic/lib)
       find_library(lib ${library}
         PATHS ${path}
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
