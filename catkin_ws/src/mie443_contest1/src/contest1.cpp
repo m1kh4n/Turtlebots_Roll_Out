@@ -15,12 +15,14 @@ using namespace std;
 
 //-----Odometry Variables-----//
 double posX, posY, yaw;
-double pi=3.1416;
+double pi = 3.1416;
 
-void odomCallback (const navmsgs::Odometry::ConstPtr& msg){
-    posx = msg->pose.pose.position.x;
-    posy = msg->pose.pose.position.y;
-    yaw = tf::getYaw(msg->pose.pose.orientation);
+void odomCallback (const nav_msgs::Odometry::ConstPtr& msg){
+	posX = msg->pose.pose.position.x;
+	posY = msg->pose.pose.position.y;
+	yaw = tf::getYaw(msg->pose.pose.orientation);
+
+	ROS_INFO("Position: (%f, %f) Orientation: %f rad or %f degrees.", posX, posY, yaw, yaw*180.0/pi);
 }
 
 //-----Bumper Variables-----//
@@ -50,7 +52,7 @@ int main(int argc, char **argv)
 	ros::NodeHandle nh;
 	teleController eStop;
     
-    ros::Subscriber odom = nh.subscribe("odom", 1, odomCallback);
+    	ros::Subscriber odom = nh.subscribe("/odom", 1, odomCallback);
 	ros::Subscriber bumper_sub = nh.subscribe("mobile_base/events/bumper", 10, &bumperCallback);
 	ros::Subscriber laser_sub = nh.subscribe("scan", 10, &laserCallback);
 
@@ -67,8 +69,8 @@ int main(int argc, char **argv)
 		//...................................
 
 		//fill with your code
-        ROS_INFO(“Position: (%f, %f) Orientation: %f rad or %f degrees.”, posX, posY, yaw, yaw*180/pi);
-        ROS_INFO(“Laser Range: %i”, laserRange);
+	        ROS_INFO("Position: (%f, %f) Orientation: %f rad or %f degrees.", posX, posY, yaw, yaw*180/pi);
+        	//ROS_INFO("Laser Range: %i", laserRange);
 
   		vel.angular.z = angular;
   		vel.linear.x = linear;

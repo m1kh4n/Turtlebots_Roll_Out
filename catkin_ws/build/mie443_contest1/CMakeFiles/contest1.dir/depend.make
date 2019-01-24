@@ -3,9 +3,21 @@
 
 mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: /home/albertliu/Turtlebots_Roll_Out/catkin_ws/src/mie443_contest1/include/eStop.h
 mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: /home/albertliu/Turtlebots_Roll_Out/catkin_ws/src/mie443_contest1/src/contest1.cpp
+mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: /opt/ros/kinetic/include/geometry_msgs/Point.h
+mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: /opt/ros/kinetic/include/geometry_msgs/PointStamped.h
+mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: /opt/ros/kinetic/include/geometry_msgs/Pose.h
+mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: /opt/ros/kinetic/include/geometry_msgs/PoseStamped.h
+mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: /opt/ros/kinetic/include/geometry_msgs/PoseWithCovariance.h
+mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: /opt/ros/kinetic/include/geometry_msgs/Quaternion.h
+mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: /opt/ros/kinetic/include/geometry_msgs/QuaternionStamped.h
+mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: /opt/ros/kinetic/include/geometry_msgs/Transform.h
+mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: /opt/ros/kinetic/include/geometry_msgs/TransformStamped.h
 mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: /opt/ros/kinetic/include/geometry_msgs/Twist.h
+mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: /opt/ros/kinetic/include/geometry_msgs/TwistWithCovariance.h
 mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: /opt/ros/kinetic/include/geometry_msgs/Vector3.h
+mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: /opt/ros/kinetic/include/geometry_msgs/Vector3Stamped.h
 mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: /opt/ros/kinetic/include/kobuki_msgs/BumperEvent.h
+mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: /opt/ros/kinetic/include/nav_msgs/Odometry.h
 mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: /opt/ros/kinetic/include/ros/advertise_options.h
 mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: /opt/ros/kinetic/include/ros/advertise_service_options.h
 mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: /opt/ros/kinetic/include/ros/assert.h
@@ -65,6 +77,14 @@ mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: /opt/ros/kinetic/inc
 mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: /opt/ros/kinetic/include/sensor_msgs/Joy.h
 mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: /opt/ros/kinetic/include/sensor_msgs/LaserScan.h
 mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: /opt/ros/kinetic/include/std_msgs/Header.h
+mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: /opt/ros/kinetic/include/tf/LinearMath/Matrix3x3.h
+mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: /opt/ros/kinetic/include/tf/LinearMath/MinMax.h
+mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: /opt/ros/kinetic/include/tf/LinearMath/QuadWord.h
+mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: /opt/ros/kinetic/include/tf/LinearMath/Quaternion.h
+mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: /opt/ros/kinetic/include/tf/LinearMath/Scalar.h
+mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: /opt/ros/kinetic/include/tf/LinearMath/Transform.h
+mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: /opt/ros/kinetic/include/tf/LinearMath/Vector3.h
+mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: /opt/ros/kinetic/include/tf/transform_datatypes.h
 mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: /opt/ros/kinetic/include/xmlrpcpp/XmlRpcDecl.h
 mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: /opt/ros/kinetic/include/xmlrpcpp/XmlRpcValue.h
 
