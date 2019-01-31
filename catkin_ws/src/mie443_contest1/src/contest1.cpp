@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <cmath>
+#include <stdlib.h>
 
 #include <nav_msgs/Odometry.h>
 #include <tf/transform_datatypes.h>
@@ -19,8 +20,7 @@ enum{
 };
 
 enum{
-	//MODE
-	INTIAL = 0;
+	INITIAL = 0;
 	EXPLORATION = 1;
 }
 
@@ -81,13 +81,19 @@ void laserCallback(const sensor_msgs::LaserScan::ConstPtr& msg){
 	if(laserRange == 11)
 		laserRange = 0;
 	
-	ROS_INFO("Range of laser is: %lf", laserRange);
+	//ROS_INFO("Range of laser is: %lf", laserRange);
 	//ROS_INFO("Size of laser scan array: %i and size of offset: %i", laserSize, laserOffset);
 }
 
 //-----Movement Functions-----//
 double angular = 0.0;
 double angleSpeed=pi/12;
+double startingYaw;
+double goalYaw;
+int rotateState;
+int firstRotate;
+double correctedYaw;
+double temp;
 
 double linear = 0.0;
 double maxSpeed = 0.25;
@@ -125,19 +131,15 @@ void moveBackwards(){
 
 void rotate(int direction, float angularSpeed){
 	linear = 0;
-	double starting_yaw = yaw;
-	if (angle > 0){
-		while (yaw-starting_yaw < angle){
-			angular = angleSpeed;	
-		}
+	if (direction == 1){
+		angular = angularSpeed;
 	}
-	else if (angle < 0){
-		while (yaw-starting_yaw > angle){
-			angular = -angleSpeed;	
-		}
+	else if (direction == -1){
+		angular = -angularSpeed;
 	}
-	ROS_INFO("Robot turning with speed of: %lf.", angular);
-} 
+	rotateState = 1;
+	//ROS_INFO("Robot turning with speed of: %lf.", angular);
+}
 
 int main(int argc, char **argv)
 {
@@ -150,44 +152,79 @@ int main(int argc, char **argv)
 	ros::Subscriber laser_sub = nh.subscribe("scan", 10, &laserCallback);
 
 	ros::Publisher vel_pub = nh.advertise<geometry_msgs::Twist>("cmd_vel_mux/input/teleop", 1);
-	int mode = INITIAL;
-	int starting_yaw = yaw;
+
 	
 	geometry_msgs::Twist vel;
 
+	firstRotate = 0;
+	rotateState = 0;	
+	startingYaw = yaw;
+	
 	while(ros::ok()){
 		ros::spinOnce();
 		//.....**E-STOP DO NOT TOUCH**.......
 		eStop.block();
 		//...................................
-	
-		//Check mode state
-		//
-
-		//Run Mode
+		
+		//angular = 0.2;
+		
 		if(mode == INITIAL){
-			//rotate 360, find largest distance 
-			
-			//turn to that distance
-
-			//Set mode to exploration
 			if(){
-				moveForward(0.25,SAFEMODE);
+				moveForward(0.25, SAFEMODE);
 				mode = EXPLORATION;
-			}	
+			}
 		}
 		else if(mode == EXPLORATION){
-			//eploration mode works well in open areas, not that good if have to go into boxes.
-			//Scan sensor values (take all sensor values and save in another array that wont update automatically)
-			//if forward direction is greater than 1 m (middle data points), move forward
-			//if forward direction less than 1, rotate to largest distance between +/-X
-			//move forward
-		}
-		
-  		vel.angular.z = angular;
-  		vel.linear.x = linear;
 
-  		vel_pub.publish(vel);
+		}	
+			
+		if (yaw <= 0){
+			correctedYaw = (M_PI-abs(yaw)) + M_PI;
+		}
+		else
+			correctedYaw = yaw;	
+		if (rotateState == 0){
+				startingYaw = correctedYaw;
+			}
+		if (firstRotate < 3){			
+			if (abs(correctedYaw-startingYaw) < ((90.0*M_PI)/180)){
+				rotate(1, 0.3);
+			}	
+			else if (abs(correctedYaw-startingYaw) >= ((90.0*M_PI)/180)){
+				stop();
+				rotateState = 0;
+			firstRotate = firstRotate + 1;
+			}
+			//temp = yaw-startingYaw;
+			temp = correctedYaw-startingYaw;
+			ROS_INFO("y - sy is: %lf, sy is: %lf, cy is: %lf, fr is: %d, rs is %d.", temp,startingYaw, yaw, firstRotate, rotateState);
+		
+		}
+		else {
+			stop();
+			ROS_INFO("Stopping, firstRotate is: %d, cy: %lf, sy: %lf,  cy - sy: %lf, rs: %d", firstRotate, yaw, startingYaw, temp, rotateState);
+		}
+
+		ROS_INFO("yaw: %lf, corrected yaw: %lf.", yaw, correctedYaw);
+				
+		/*
+		if (laserRange < 0.45){
+			rotate(90.0);
+		}
+		else if (laserRange < 1)
+			moveForward(0.1, REGULARMODE);
+		else if(laserRange >= 1)
+			moveForward(0.2, REGULARMODE);
+	        */
+		
+		//ROS_INFO("Position: (%f, %f) Orientation: %f rad or %f degrees.", posX, posY, yaw, yaw*180/pi);
+        	//ROS_INFO("Size of laser scan array: %i and size of offset: %i", laserSize, laserOffset);
+		//ROS_INFO("Laser Range: %i", laserRange);
+
+// 		vel.angular.z = angular;
+// 		vel.linear.x = linear;
+
+//  		vel_pub.publish(vel);
 	}
 
 	return 0;
