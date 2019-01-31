@@ -13,6 +13,11 @@
 
 using namespace std;
 
+enum{
+	REGULARMODE = 0,
+	SAFEMODE = 1,
+};
+
 //-----Odometry Variables-----//
 double posX, posY, yaw;
 double pi = 3.1416;
@@ -80,7 +85,6 @@ double angleSpeed=pi/12;
 
 double linear = 0.0;
 double maxSpeed = 0.25;
-int safety = 1;
 
 void stop(){
 	linear = 0;
@@ -150,7 +154,14 @@ int main(int argc, char **argv)
 		eStop.block();
 		//...................................
 		
-		moveForward(1.0, safety);
+		if (laserRange < 0.45){
+			stop();
+			rotate(90.0);
+		}
+		else if (laserRange < 1)
+			moveForward(0.1, REGULARMODE);
+		else if(laserRange >= 1)
+			moveForward(0.2, REGULARMODE);
 	        //ROS_INFO("Position: (%f, %f) Orientation: %f rad or %f degrees.", posX, posY, yaw, yaw*180/pi);
         	ROS_INFO("Size of laser scan array: %i and size of offset: %i", laserSize, laserOffset);
 		//ROS_INFO("Laser Range: %i", laserRange);
