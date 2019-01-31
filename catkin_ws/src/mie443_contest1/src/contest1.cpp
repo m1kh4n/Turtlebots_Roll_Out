@@ -170,7 +170,7 @@ int main(int argc, char **argv)
 			}	
 		}
 		else if(mode == EXPLORATION){
-			//eploration mode works well in open areas, not that good if have to go into boxes
+			//eploration mode works well in open areas, not that good if have to go into boxes.
 			//Scan sensor values (take all sensor values and save in another array that wont update automatically)
 			//if forward direction is greater than 1 m (middle data points), move forward
 			//if forward direction less than 1, rotate to largest distance between +/-X
