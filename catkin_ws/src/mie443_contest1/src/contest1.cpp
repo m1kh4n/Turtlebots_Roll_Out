@@ -123,7 +123,7 @@ void moveBackwards(){
 	linear = -0.1;
 }
 
-void rotate(float angle){
+void rotate(int direction, float angularSpeed){
 	linear = 0;
 	double starting_yaw = yaw;
 	if (angle > 0){
@@ -151,6 +151,7 @@ int main(int argc, char **argv)
 
 	ros::Publisher vel_pub = nh.advertise<geometry_msgs::Twist>("cmd_vel_mux/input/teleop", 1);
 	int mode = INITIAL;
+	int starting_yaw = yaw;
 	
 	geometry_msgs::Twist vel;
 
@@ -159,13 +160,19 @@ int main(int argc, char **argv)
 		//.....**E-STOP DO NOT TOUCH**.......
 		eStop.block();
 		//...................................
-		
+	
+		//Check mode state
+		//
+
+		//Run Mode
 		if(mode == INITIAL){
 			//rotate 360, find largest distance 
-			//
+			
 			//turn to that distance
+
+			//Set mode to exploration
 			if(){
-				moveforward();
+				moveForward(0.25,SAFEMODE);
 				mode = EXPLORATION;
 			}	
 		}
@@ -174,8 +181,6 @@ int main(int argc, char **argv)
 			//if forward direction is greater than 1 m, move forward
 			//if forward direction less than 1, rotate to largest distance
 		}
-
-		//Loop to update mode
 		
   		vel.angular.z = angular;
   		vel.linear.x = linear;
