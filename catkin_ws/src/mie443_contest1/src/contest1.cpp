@@ -169,62 +169,58 @@ int main(int argc, char **argv)
 		//angular = 0.2;
 		
 		if(mode == INITIAL){
-			if(){
-				moveForward(0.25, SAFEMODE);
-				mode = EXPLORATION;
+			//Scan 360 degrees
+			if(scanState==0){
+				if (yaw <= 0){
+					correctedYaw = (M_PI-abs(yaw)) + M_PI;
+					}
+				else
+					correctedYaw = yaw;	
+				if (rotateState == 0){
+					startingYaw = correctedYaw;
+				}
+				if (firstRotate < 3){			
+					if (abs(correctedYaw-startingYaw) < ((90.0*M_PI)/180)){
+						rotate(1, 0.3);
+					}	
+					else if (abs(correctedYaw-startingYaw) >= ((90.0*M_PI)/180)){
+						stop();
+						rotateState = 0;
+						firstRotate = firstRotate + 1;
+					}
+				//temp = yaw-startingYaw;
+				temp = correctedYaw-startingYaw;
+				ROS_INFO("y - sy is: %lf, sy is: %lf, cy is: %lf, fr is: %d, rs is %d.", temp,startingYaw, yaw, firstRotate, rotateState);
+			
+				}
+				else {
+					stop();
+					ROS_INFO("Stopping, firstRotate is: %d, cy: %lf, sy: %lf,  cy - sy: %lf, rs: %d", firstRotate, yaw, startingYaw, temp, rotateState);
+				}
+
+				ROS_INFO("yaw: %lf, corrected yaw: %lf.", yaw, correctedYaw);
 			}
-		}
+			else if (scanState==1)
+
+				if(){
+					moveForward(0.25, SAFEMODE);
+					mode = EXPLORATION;
+				}
+			}
+
+		//Exploration Mode
 		else if(mode == EXPLORATION){
 
 		}	
-			
-		if (yaw <= 0){
-			correctedYaw = (M_PI-abs(yaw)) + M_PI;
-		}
-		else
-			correctedYaw = yaw;	
-		if (rotateState == 0){
-				startingYaw = correctedYaw;
-			}
-		if (firstRotate < 3){			
-			if (abs(correctedYaw-startingYaw) < ((90.0*M_PI)/180)){
-				rotate(1, 0.3);
-			}	
-			else if (abs(correctedYaw-startingYaw) >= ((90.0*M_PI)/180)){
-				stop();
-				rotateState = 0;
-			firstRotate = firstRotate + 1;
-			}
-			//temp = yaw-startingYaw;
-			temp = correctedYaw-startingYaw;
-			ROS_INFO("y - sy is: %lf, sy is: %lf, cy is: %lf, fr is: %d, rs is %d.", temp,startingYaw, yaw, firstRotate, rotateState);
-		
-		}
-		else {
-			stop();
-			ROS_INFO("Stopping, firstRotate is: %d, cy: %lf, sy: %lf,  cy - sy: %lf, rs: %d", firstRotate, yaw, startingYaw, temp, rotateState);
-		}
-
-		ROS_INFO("yaw: %lf, corrected yaw: %lf.", yaw, correctedYaw);
 				
-		/*
-		if (laserRange < 0.45){
-			rotate(90.0);
-		}
-		else if (laserRange < 1)
-			moveForward(0.1, REGULARMODE);
-		else if(laserRange >= 1)
-			moveForward(0.2, REGULARMODE);
-	        */
-		
 		//ROS_INFO("Position: (%f, %f) Orientation: %f rad or %f degrees.", posX, posY, yaw, yaw*180/pi);
         	//ROS_INFO("Size of laser scan array: %i and size of offset: %i", laserSize, laserOffset);
 		//ROS_INFO("Laser Range: %i", laserRange);
 
-// 		vel.angular.z = angular;
-// 		vel.linear.x = linear;
+ 		vel.angular.z = angular;
+		vel.linear.x = linear;
 
-//  		vel_pub.publish(vel);
+		vel_pub.publish(vel);
 	}
 
 	return 0;
