@@ -18,6 +18,12 @@ enum{
 	SAFEMODE = 1,
 };
 
+enum{
+	//MODE
+	INTIAL = 0;
+	EXPLORATION = 1;
+}
+
 //-----Odometry Variables-----//
 double posX, posY, yaw;
 double pi = 3.1416;
@@ -144,7 +150,7 @@ int main(int argc, char **argv)
 	ros::Subscriber laser_sub = nh.subscribe("scan", 10, &laserCallback);
 
 	ros::Publisher vel_pub = nh.advertise<geometry_msgs::Twist>("cmd_vel_mux/input/teleop", 1);
-
+	int mode = INITIAL;
 	
 	geometry_msgs::Twist vel;
 
@@ -154,18 +160,23 @@ int main(int argc, char **argv)
 		eStop.block();
 		//...................................
 		
-		if (laserRange < 0.45){
-			stop();
-			rotate(90.0);
+		if(mode == INITIAL){
+			//rotate 360, find largest distance 
+			//
+			//turn to that distance
+			if(){
+				moveforward();
+				mode = EXPLORATION;
+			}	
 		}
-		else if (laserRange < 1)
-			moveForward(0.1, REGULARMODE);
-		else if(laserRange >= 1)
-			moveForward(0.2, REGULARMODE);
-	        //ROS_INFO("Position: (%f, %f) Orientation: %f rad or %f degrees.", posX, posY, yaw, yaw*180/pi);
-        	ROS_INFO("Size of laser scan array: %i and size of offset: %i", laserSize, laserOffset);
-		//ROS_INFO("Laser Range: %i", laserRange);
+		else if(mode == EXPLORATION){
+			//Scan sensor values
+			//if forward direction is greater than 1 m, move forward
+			//if forward direction less than 1, rotate to largest distance
+		}
 
+		//Loop to update mode
+		
   		vel.angular.z = angular;
   		vel.linear.x = linear;
 
