@@ -20,9 +20,23 @@ enum{
 };
 
 enum{
+	//MODE
 	INITIAL = 0;
 	EXPLORATION = 1;
 }
+
+enum{
+	//State
+	SCAN = 0
+	ROTATE = 1
+	MOVE = 2
+}
+
+enum{
+	RIGHT =0;
+	LEFT = 1;
+}
+
 
 //-----Odometry Variables-----//
 double posX, posY, yaw;
@@ -31,7 +45,7 @@ double pi = 3.1416;
 void odomCallback (const nav_msgs::Odometry::ConstPtr& msg){
 	posX = msg->pose.pose.position.x;
 	posY = msg->pose.pose.position.y;
-	yaw = tf::getYaw(msg->pose.pose.orientation);
+	yaw = (tf::getYaw(msg->pose.pose.orientation))*180.0/M_PI + 180.0;
 
 	//ROS_INFO("Position: (%f, %f) Orientation: %f rad or %f degrees.", posX, posY, yaw, yaw*180.0/pi);
 }
@@ -156,6 +170,10 @@ int main(int argc, char **argv)
 	
 	geometry_msgs::Twist vel;
 
+	//Initialize mode
+	mode = INITIAL;
+	state = SCAN;
+
 	firstRotate = 0;
 	rotateState = 0;	
 	startingYaw = yaw;
@@ -170,7 +188,8 @@ int main(int argc, char **argv)
 		
 		if(mode == INITIAL){
 			//Scan 360 degrees
-			if(scanState==0){
+			if(state == SCAN){
+				/* 
 				if (yaw <= 0){
 					correctedYaw = (M_PI-abs(yaw)) + M_PI;
 					}
@@ -199,8 +218,29 @@ int main(int argc, char **argv)
 				}
 
 				ROS_INFO("yaw: %lf, corrected yaw: %lf.", yaw, correctedYaw);
+				state = MOVE
+				*/
+
+				startingYaw = Yaw;
+				dYaw=0;
+				double goalYaw;
+			        goalYaw = (startingYaw + desiredRotation)%360.0;	
+
+				while(((goalYaw - currentYaw) < 0.5) && desiredRotation > 0){
+
+					currentYaw;
+					 previousYaw;
+
+					if(currentYaw-previousYaw<0)
+						
+					rotate(LEFT,0.3)
+					vel.angular.z = angular;
+					vel.linear.x = linear;
+
+					vel_pub.publish(vel);
+				}
 			}
-			else if (scanState==1)
+			else if (state == MOVE)
 
 				if(){
 					moveForward(0.25, SAFEMODE);
@@ -210,6 +250,7 @@ int main(int argc, char **argv)
 
 		//Exploration Mode
 		else if(mode == EXPLORATION){
+
 
 		}	
 				
