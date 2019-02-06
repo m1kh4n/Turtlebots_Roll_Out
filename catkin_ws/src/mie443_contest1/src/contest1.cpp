@@ -200,39 +200,7 @@ int main(int argc, char **argv)
 				//----------range so it can point the robot in that direction again.----------------------------------------------//
 				double maxRange = 0; 
 				double maxRangeHeading = 0;
-			/*
-			/-------------- Old less efficient rotation code, works but if new code works as well, should be replaced-----------------/		
-			if(state == SCAN){
-				if (yaw <= 0){
-					correctedYaw = (M_PI-abs(yaw)) + M_PI;
-					}
-				else
-					correctedYaw = yaw;	
-				if (rotateState == 0){
-					startingYaw = correctedYaw;
-				}
-				if (firstRotate < 3){			
-					if (abs(correctedYaw-startingYaw) < ((90.0*M_PI)/180)){
-						rotate(1, 0.3);
-					}	
-					else if (abs(correctedYaw-startingYaw) >= ((90.0*M_PI)/180)){
-						stop();
-						rotateState = 0;
-						firstRotate = firstRotate + 1;
-					}
-				//temp = yaw-startingYaw;
-				temp = correctedYaw-startingYaw;
-				ROS_INFO("y - sy is: %lf, sy is: %lf, cy is: %lf, fr is: %d, rs is %d.", temp,startingYaw, yaw, firstRotate, rotateState);
 			
-				}
-				else {
-					stop();
-					ROS_INFO("Stopping, firstRotate is: %d, cy: %lf, sy: %lf,  cy - sy: %lf, rs: %d", firstRotate, yaw, startingYaw, temp, rotateState);
-				}
-
-				ROS_INFO("yaw: %lf, corrected yaw: %lf.", yaw, correctedYaw);
-<<<<<<< HEAD
-			*/
 
 			//-------------------New rotation code, based on while loops and modulus of 360-------------------------------------------------//
 			
@@ -284,6 +252,39 @@ int main(int argc, char **argv)
 				vel.linear.x = 0;
 			
 				state = MOVE;
+
+/*
+			/-------------- Old less efficient rotation code, works but if new code works as well, should be replaced-----------------/		
+			if(state == SCAN){
+				if (yaw <= 0){
+					correctedYaw = (M_PI-abs(yaw)) + M_PI;
+					}
+				else
+					correctedYaw = yaw;	
+				if (rotateState == 0){
+					startingYaw = correctedYaw;
+				}
+				if (firstRotate < 3){			
+					if (abs(correctedYaw-startingYaw) < ((90.0*M_PI)/180)){
+						rotate(1, 0.3);
+					}	
+					else if (abs(correctedYaw-startingYaw) >= ((90.0*M_PI)/180)){
+						stop();
+						rotateState = 0;
+						firstRotate = firstRotate + 1;
+					}
+				//temp = yaw-startingYaw;
+				temp = correctedYaw-startingYaw;
+				ROS_INFO("y - sy is: %lf, sy is: %lf, cy is: %lf, fr is: %d, rs is %d.", temp,startingYaw, yaw, firstRotate, rotateState);
+			
+				}
+				else {
+					stop();
+					ROS_INFO("Stopping, firstRotate is: %d, cy: %lf, sy: %lf,  cy - sy: %lf, rs: %d", firstRotate, yaw, startingYaw, temp, rotateState);
+				}
+
+				ROS_INFO("yaw: %lf, corrected yaw: %lf.", yaw, correctedYaw);
+			*/
 			}
 			
 			// Matthew add code here before testing, I'm not too sure what exactly you want this part to do yet
