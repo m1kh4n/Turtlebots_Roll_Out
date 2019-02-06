@@ -11,6 +11,8 @@
 
 #include <nav_msgs/Odometry.h>
 #include <tf/transform_datatypes.h>
+#DEFINE RAD_TO_DEG 180.0/M_PI
+#DEFINE DEG_TO_RAD M_PI/180.0
 
 using namespace std;
 
@@ -20,18 +22,20 @@ enum{
 };
 
 enum{
-	INITIAL = 0;
-	EXPLORATION = 1;
+	INITIAL = 0,
+	EXPLORATION = 1,
 }
 
 //-----Odometry Variables-----//
-double posX, posY, yaw;
+double posX;
+double posY;
+double yaw;
 double pi = 3.1416;
 
 void odomCallback (const nav_msgs::Odometry::ConstPtr& msg){
 	posX = msg->pose.pose.position.x;
 	posY = msg->pose.pose.position.y;
-	yaw = tf::getYaw(msg->pose.pose.orientation);
+	yaw = (tf::getYaw(msg->pose.pose.orientation))*RAD_TO_DEG;
 
 	//ROS_INFO("Position: (%f, %f) Orientation: %f rad or %f degrees.", posX, posY, yaw, yaw*180.0/pi);
 }
@@ -94,6 +98,7 @@ int rotateState;
 int firstRotate;
 double correctedYaw;
 double temp;
+double desiredRotation;
 
 double linear = 0.0;
 double maxSpeed = 0.25;
@@ -156,6 +161,9 @@ int main(int argc, char **argv)
 	
 	geometry_msgs::Twist vel;
 
+	int mode = INITIAL;
+	int scanState = 0;	
+
 	firstRotate = 0;
 	rotateState = 0;	
 	startingYaw = yaw;
@@ -171,6 +179,14 @@ int main(int argc, char **argv)
 		if(mode == INITIAL){
 			//Scan 360 degrees
 			if(scanState==0){
+				desiredRotation = 350.0; //Default desired rotation for scan state, allows robot to scan pretty much everything around it  	
+				
+				//----------Scan needs to be able to remember the max range it found during the scan and the yaw of that----------//
+				//----------range so it can point the robot in that direction again.----------------------------------------------//
+				double maxRange = 0; 
+				double maxRangeHeading = 0;
+			/*
+			/-------------- Old less efficient rotation code, works but if new code works as well, should be replaced-----------------/		
 				if (yaw <= 0){
 					correctedYaw = (M_PI-abs(yaw)) + M_PI;
 					}
@@ -199,6 +215,56 @@ int main(int argc, char **argv)
 				}
 
 				ROS_INFO("yaw: %lf, corrected yaw: %lf.", yaw, correctedYaw);
+			*/
+
+			//-------------------New rotation code, based on while loops and modulus of 360-------------------------------------------------//
+			
+			//-------------------This code only works for rotating in one direction right now and only in the scan state, so----------------// 
+			//-------------------if we want to scan 360(or any angle) in exploration mode, state must first be set to INITIAL --------------//
+			//-------------------and then the robot will start rotating the next time it loops through the main while loop.-----------------//
+			//-------------------Further improvements can be made by adding a check for a rotation flag at the beginning of the main--------//
+			//-------------------while loop so that everytime the main loop runs, the robot checks if another part of the code--------------//
+			//-------------------has requested a rotation in the cycle before and if the flag is set as TRUE, it will execute the-----------//
+			//-------------------rotation loop.---------------------------------------------------------------------------------------------//  	
+			
+			//-------------------Initial scan of surroundings-------------------------------------------------------------------------------//	
+				if (yaw <= 0){
+					correctedYaw = (180.0-abs(yaw)) + 180.0;
+					}
+				else
+					correctedYaw = yaw;
+				goalYaw = correctedYaw + desiredRotation;
+				if(goalYaw > 360.0)
+					goalYaw = goalYaw - 360.0;
+				while(abs(goalYaw-correctedYaw) > 0.1){
+					rotate(1, 0.3);
+					if (laserRange > maxRange){
+						maxRange = laserRange;
+						maxRangeHeading = correctedYaw;
+					}	
+					vel.angular.z = angular;
+					vel.linear.x = linear;
+
+					vel_pub.publish(vel);
+				}
+				
+			//------------------Reorienting robot to the yaw which had the longest range, and maybe want to check if the--------------------//
+			//------------------sides are clear as well? Just so no corners are clipped. Not implemented yet. Maybe store-------------------//
+			//------------------second and third longest ranges as well. Test and see.------------------------------------------------------//
+				goalYaw = maxRangeHeading;
+				while(abs(goalYaw-correctedYaw) > 0.1){
+					rotate(1,0.3);
+					
+					vel.angular.z = angular;
+					vel.linear.x = linear;
+					vel_pub.publish(vel);
+				}
+			//------------------Scanning complete, robot correctly oriented, set mode to EXPLORATION for next cycle-------------------------//
+			//------------------Also reset linear and angular velocities so publish at the end doesn't publish junk-------------------------//	
+				mode = EXPLORATION;
+				vel.angular.z = 0;
+				vel.linear.x = 0;
+			
 			}
 			else if (scanState==1)
 
