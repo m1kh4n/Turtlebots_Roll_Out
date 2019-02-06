@@ -11,8 +11,8 @@
 
 #include <nav_msgs/Odometry.h>
 #include <tf/transform_datatypes.h>
-#DEFINE RAD_TO_DEG 180.0/M_PI
-#DEFINE DEG_TO_RAD M_PI/180.0
+#define RAD_TO_DEG 180.0/M_PI
+#define DEG_TO_RAD M_PI/180.0
 
 using namespace std;
 
@@ -24,17 +24,30 @@ enum{
 enum{
 	INITIAL = 0,
 	EXPLORATION = 1,
-}
+};
+
+enum{
+	//State
+	SCAN = 0,
+	ROTATE = 1,
+	MOVE = 2,
+};
+
+enum{
+	RIGHT =0,
+	LEFT = 1,
+};
+
 
 //-----Odometry Variables-----//
-double posX;
-double posY;
+double positionX;
+double positionY;
 double yaw;
 double pi = 3.1416;
 
 void odomCallback (const nav_msgs::Odometry::ConstPtr& msg){
-	posX = msg->pose.pose.position.x;
-	posY = msg->pose.pose.position.y;
+	positionX = msg->pose.pose.position.x;
+	positionY = msg->pose.pose.position.y;
 	yaw = (tf::getYaw(msg->pose.pose.orientation))*RAD_TO_DEG;
 
 	//ROS_INFO("Position: (%f, %f) Orientation: %f rad or %f degrees.", posX, posY, yaw, yaw*180.0/pi);
@@ -161,8 +174,9 @@ int main(int argc, char **argv)
 	
 	geometry_msgs::Twist vel;
 
+	//Initialize mode
 	int mode = INITIAL;
-	int scanState = 0;	
+	int state = 0;
 
 	firstRotate = 0;
 	rotateState = 0;	
@@ -178,7 +192,8 @@ int main(int argc, char **argv)
 		
 		if(mode == INITIAL){
 			//Scan 360 degrees
-			if(scanState==0){
+
+			if(state==0){
 				desiredRotation = 350.0; //Default desired rotation for scan state, allows robot to scan pretty much everything around it  	
 				
 				//----------Scan needs to be able to remember the max range it found during the scan and the yaw of that----------//
@@ -187,6 +202,7 @@ int main(int argc, char **argv)
 				double maxRangeHeading = 0;
 			/*
 			/-------------- Old less efficient rotation code, works but if new code works as well, should be replaced-----------------/		
+			if(state == SCAN){
 				if (yaw <= 0){
 					correctedYaw = (M_PI-abs(yaw)) + M_PI;
 					}
@@ -215,6 +231,7 @@ int main(int argc, char **argv)
 				}
 
 				ROS_INFO("yaw: %lf, corrected yaw: %lf.", yaw, correctedYaw);
+<<<<<<< HEAD
 			*/
 
 			//-------------------New rotation code, based on while loops and modulus of 360-------------------------------------------------//
@@ -230,9 +247,10 @@ int main(int argc, char **argv)
 			//-------------------Initial scan of surroundings-------------------------------------------------------------------------------//	
 				if (yaw <= 0){
 					correctedYaw = (180.0-abs(yaw)) + 180.0;
-					}
+				}
 				else
 					correctedYaw = yaw;
+					
 				goalYaw = correctedYaw + desiredRotation;
 				if(goalYaw > 360.0)
 					goalYaw = goalYaw - 360.0;
@@ -265,17 +283,21 @@ int main(int argc, char **argv)
 				vel.angular.z = 0;
 				vel.linear.x = 0;
 			
+				state = MOVE;
 			}
-			else if (scanState==1)
-
-				if(){
+			
+			// Matthew add code here before testing, I'm not too sure what exactly you want this part to do yet
+			else if (state == MOVE){
+			
+				if(0){ //temporary condition, change before testing
 					moveForward(0.25, SAFEMODE);
 					mode = EXPLORATION;
 				}
 			}
-
+		}
 		//Exploration Mode
 		else if(mode == EXPLORATION){
+
 
 		}	
 				
