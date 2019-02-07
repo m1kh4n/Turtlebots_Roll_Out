@@ -159,10 +159,6 @@ void rotate(int direction, float angularSpeed){
 	//ROS_INFO("Robot turning with speed of: %lf.", angular);
 }
 
-void lineardistance(double tempposX, initialposX, tempposY, initialposY){
-	lineardistance = abs(sqrt((tempposX - initialposX)^2 + (tempposY - initialposY)^2));
-}
-
 int main(int argc, char **argv)
 {
 	ros::init(argc, argv, "image_listener");
@@ -304,95 +300,17 @@ int main(int argc, char **argv)
 		else if(mode == EXPLORATION){
 
 
-            ROS_INFO("Position: (%f m, %f m) Orientation: %f degrees Range: %f m", posX, posY, yaw, laserRange);
-            double tempYaw = 0;
-            double currentYaw = (180.0-abs(yaw)) + 180.0;
-            double tempposX = 0;
-            double tempposY = 0;
-            double currentposY= posY;
-            double currentposX = posX;
-            double laserturn = 20;
-            double spiralturn = 30
-
-            if (bumperRight == 0 && bumperCentre == 0 && bumperLeft == 0)
-            {
-                tempYaw = round(currentYaw); // round because of slip
-
-                if (laserRange > 0.5 && round(currentYaw) != tempYaw >  ){
-                    while (lineardistance(currentposX,prevposX,currentposY,prevposY)<1)
-                        moveForward ( 0.25, 0);    
-              vel.angular.z = angular;
-              vel.linear.x = linear;
-        //Exploration Mode
-        else if(mode == EXPLORATION){
-		ROS_INFO("Position: (%f, %f) Orientation: %f degrees Range %f", posX, posY, yaw, laserRange);
-		double tempYaw = 0;
-		double initialYaw = 0;
-		double tempposX = 0;
-		double tempposY = 0;
-		double initialposY = 0;
-		double initialposX = 0;
-		double laserturn = 20;
-		double spiralturn = 20;
-		double spiralinitialYaw = 0;
-
-		if (bumperRight == 0 && bumperLeft == 0 && bumperCenter ==0){
-			ros::spinOnce();
-			tempYaw = (180 -abs(yaw)) + 180;
-			laserinitialYaw =(180-abs(yaw))+180;
-				initialPosX = posX;
-			initalPosY = posY;
-		//	tempYaw = round(currentYaw);
-			if (laserRange > 0.5 && round(spiralinitialYaw) != round(tempYaw)) {
-			       while (lineardistance (tempposX, initalposX, tempposY, initalposX) <1){
-				       moveForward (0.25, 0);
-			    		vel.angular.z = angular;
-			 		vel.linear.x = linar;
-			 		vel_pub.publish(vel);
-			 		ros::spinOnce();
-			       		tempposX = posX;
-			       		tempposY = posY;
-			        }
-			       initalposX = tempposX;
-			       initalposY = tempposY;
-			}
-			else if (laserRange <=0.5 && round(spiralinitalYaw) != round(tempYaw)){
-				while (abs(round(tempYaw) - round(laserinitalYaw)) < laserturn){
-					rotate(1,0.3);
-					vel.angular.z = angular;
-					vel.linear.x = linear;
-					vel_pub.publish(vel);
-					ros::spinOnce();
-					tempYaw = (180 -abs(yaw))+180;
-				}
-				ros::spinOnce();
-				laserinitialYaw = round(tempYaw);
+		}	
 				
-			}
-			else if (round(spiralinitialYaw) == round(tempYaw)){
-				while (abs(round(tempYaw)-round(spiralnitialYaw)) < spiralturn && spiralturn <= 60){
-					rotate(1,0.3);
-					vel.angular.z = angular;
-					vel.linar.x = linear;
-					vel_pub.publish(vel);
-					ros::spinOnce();
-					tempYaw = (180 - abs(yaw))+180;
-					spiralturn = spiralturn + 10;
-					if (spiralturn > 60){
-						stiop();
-					}
-					
-				}
-				spiralinitialYaw = (180 - abs(yaw)) + 180;
-				tempYaw = 0;
-			}
-			ROS_INFO("tempYaw: %f degrees, initialYaw: %f degrees, tempposX: %f, tempposY: %f, initialposX: %f, initialposY: %f, laserturn: %f degrees, spiralturn: %f", tempYaw, initialYaw, tempposX, tempposY, initialposX, initalposY, laserturn, spiralturn);
-		}
+		//ROS_INFO("Position: (%f, %f) Orientation: %f rad or %f degrees.", posX, posY, yaw, yaw*180/pi);
+        	//ROS_INFO("Size of laser scan array: %i and size of offset: %i", laserSize, laserOffset);
+		//ROS_INFO("Laser Range: %i", laserRange);
+
+ 		vel.angular.z = angular;
+		vel.linear.x = linear;
+
+		vel_pub.publish(vel);
 	}
 
-					 
-
-
-
-					
-					
+	return 0;
+}
