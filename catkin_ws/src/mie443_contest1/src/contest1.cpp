@@ -223,7 +223,14 @@ int main(int argc, char **argv)
 				if(goalYaw > 360.0)
 					goalYaw = goalYaw - 360.0;
 				while(abs(goalYaw-correctedYaw) > 0.1){
-					ROS_INFO("In first rotate while loop, publishing data.\n");
+					ROS_INFO("In first rotate while loop, publishing data, goalYaw: %lf, correctedYaw: %lf.\n", goalYaw, correctedYaw);
+					
+					if (yaw <= 0){
+						correctedYaw = (180.0-abs(yaw)) + 180.0;
+					}
+					else
+						correctedYaw = yaw;
+
 					rotate(1, 0.3);
 					if (laserRange > maxRange){
 						maxRange = laserRange;
