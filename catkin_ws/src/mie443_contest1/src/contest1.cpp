@@ -298,60 +298,31 @@ int main(int argc, char **argv)
 		}
 		//Exploration Mode
 		else if(mode == EXPLORATION){
-			ROS_INFO("Position: (%f, %f) Orientation: %f degrees Range %f", posX, posY, yaw, laserRange);
-				if (bumperRight == 0 && bumperLeft == 0 && bumperCentre ==0){
-				ros::spinOnce();
-				tempYaw = (180 -abs(yaw)) + 180;
-				laserinitialYaw =(180-abs(yaw))+180;
-				initialposX = posX;
-				initialposY = posY;
-		//		tempYaw = round(currentYaw);
-				lineardistance(tempposX, initialposX, tempposY, initialposY);
-				if (laserRange > 0.5 && round(spiralinitialYaw) != round(tempYaw)) {
-			       		while (linearDistance < 1){
-				       		moveForward (0.25, 0);
-			    			vel.angular.z = angular;
-			 			vel.linear.x = linear;
-			 			vel_pub.publish(vel);
-			 			ros::spinOnce();
-			       			tempposX = posX;
-			       			tempposY = posY;
-						lineardistance(tempposX, initialposX, tempposY, initialposY);
-			        	}	
-			       	initialposX = tempposX;
-			       	initialposY = tempposY;
-				}
-				else if (laserRange <=0.5 && round(spiralinitialYaw) != round(tempYaw)){
-					while (abs(round(tempYaw) - round(laserinitialYaw)) < laserturn){
-						rotate(1,0.3);
-						vel.angular.z = angular;
-						vel.linear.x = linear;
-						vel_pub.publish(vel);
-						ros::spinOnce();
-						tempYaw = (180 -abs(yaw))+180;
-					}
-					ros::spinOnce();
-					laserinitialYaw = round(tempYaw);
-				}
-				else if (round(spiralinitialYaw) == round(tempYaw)){
-					while (abs(round(tempYaw)-round(spiralinitialYaw)) < spiralturn && spiralturn <= 60){
-						rotate(1,0.3);
-						vel.angular.z = angular;
-						vel.linear.x = linear;
-						vel_pub.publish(vel);
-						ros::spinOnce();
-						tempYaw = (180 - abs(yaw))+180;
-						spiralturn = spiralturn + 10;
-						if (spiralturn > 60){
-							stop();
-						}	
-					
-					}
-				spiralinitialYaw = (180 - abs(yaw)) + 180;
-				tempYaw = 0;
-				}
+			//if center bumper pressed, do 
+			if(bumperCenter == 1){
+				ROS_INFO("Bumper Hit");
+				mode = INITIAL;
 			}
-			ROS_INFO("tempYaw: %f degrees, initialYaw: %f degrees, tempposX: %f, tempposY: %f, initialposX: %f, initialposY: %f, laserturn: %f degrees, spiralturn: %f", tempYaw, initialYaw, tempposX, tempposY, initialposX, initialposY, laserturn, spiralturn);
+			//if distance > 0.5, go forward
+			else if(laserRange>0.5){
+				ROS_INFO("Moving Foward");
+				moveForward(0.25,REGULARMODE);
+			}
+			//if distance < 0.5, rotate until distance > 1.5
+			else if(laserRange<0.5)
+
+
+			}
+			//if all distance in laser array < 0.5, got to initial mode
+			else if(cornered()){
+				ROS_INFO("Cornered");
+				mode=INITIAL;
+			}
+			else{
+				ROS_INFO("Don't know what to do");
+				stop();
+			}
+
 		}	
 				
 		//ROS_INFO("Position: (%f, %f) Orientation: %f rad or %f degrees.", posX, posY, yaw, yaw*180/pi);
@@ -399,4 +370,63 @@ int main(int argc, char **argv)
 				}
 
 				ROS_INFO("yaw: %lf, corrected yaw: %lf.", yaw, correctedYaw);
-			*/
+
+			/-------------- Sprial Exloration Code, compiles but doesn't work-----------------/
+			ROS_INFO("Position: (%f, %f) Orientation: %f degrees Range %f", posX, posY, yaw, laserRange);
+			if (bumperRight == 0 && bumperLeft == 0 && bumperCentre ==0){
+				ros::spinOnce();
+				tempYaw = (180 -abs(yaw)) + 180;
+				laserinitialYaw =(180-abs(yaw))+180;
+				initialposX = posX;
+				initialposY = posY;
+		//		tempYaw = round(currentYaw);
+				lineardistance(tempposX, initialposX, tempposY, initialposY);
+
+				//Nothing in front and not in oringal 
+				if (laserRange > 0.5 && round(spiralinitialYaw) != round(tempYaw)) {
+			       		while (linearDistance < 1){
+				       		moveForward (0.25, 0);
+			    			vel.angular.z = angular;
+			 			vel.linear.x = linear;
+			 			vel_pub.publish(vel);
+			 			ros::spinOnce();
+			       			tempposX = posX;
+			       			tempposY = posY;
+						lineardistance(tempposX, initialposX, tempposY, initialposY);
+			        	}	
+			       	initialposX = tempposX;
+			       	initialposY = tempposY;
+				}
+				else if (laserRange <=0.5 && round(spiralinitialYaw) != round(tempYaw)){
+					while (abs(round(tempYaw) - round(laserinitialYaw)) < laserturn){
+						rotate(1,0.3);
+						vel.angular.z = angular;
+						vel.linear.x = linear;
+						vel_pub.publish(vel);
+						ros::spinOnce();
+						tempYaw = (180 -abs(yaw))+180;
+					}
+					ros::spinOnce();
+					laserinitialYaw = round(tempYaw);
+				}
+				else if (round(spiralinitialYaw) == round(tempYaw)){
+					while (abs(round(tempYaw)-round(spiralinitialYaw)) < spiralturn && spiralturn <= 60){
+						rotate(1,0.3);
+						vel.angular.z = angular;
+						vel.linear.x = linear;
+						vel_pub.publish(vel);
+						ros::spinOnce();
+						tempYaw = (180 - abs(yaw))+180;
+						spiralturn = spiralturn + 10;
+						if (spiralturn > 60){
+							stop();
+						}	
+					
+					}
+				spiralinitialYaw = (180 - abs(yaw)) + 180;
+				tempYaw = 0;
+				}
+			}
+			ROS_INFO("tempYaw: %f degrees, initialYaw: %f degrees, tempposX: %f, tempposY: %f, initialposX: %f, initialposY: %f, laserturn: %f degrees, spiralturn: %f", tempYaw, initialYaw, tempposX, tempposY, initialposX, initialposY, laserturn, spiralturn);
+
+*/
