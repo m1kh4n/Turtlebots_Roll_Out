@@ -192,7 +192,7 @@ int main(int argc, char **argv)
 		
 		if(mode == INITIAL){
 			//Scan 360 degrees
-
+			
 			if(state==0){
 				desiredRotation = 350.0; //Default desired rotation for scan state, allows robot to scan pretty much everything around it  	
 				
@@ -223,6 +223,7 @@ int main(int argc, char **argv)
 				if(goalYaw > 360.0)
 					goalYaw = goalYaw - 360.0;
 				while(abs(goalYaw-correctedYaw) > 0.1){
+					ROS_INFO("In first rotate while loop, publishing data.\n");
 					rotate(1, 0.3);
 					if (laserRange > maxRange){
 						maxRange = laserRange;
@@ -239,6 +240,7 @@ int main(int argc, char **argv)
 			//------------------second and third longest ranges as well. Test and see.------------------------------------------------------//
 				goalYaw = maxRangeHeading;
 				while(abs(goalYaw-correctedYaw) > 0.1){
+					ROS_INFO("In second rotate while loop, should be aligning with direction of longest range.\n");
 					rotate(1,0.3);
 					
 					vel.angular.z = angular;
