@@ -181,7 +181,12 @@ int main(int argc, char **argv)
 	firstRotate = 0;
 	rotateState = 0;	
 	startingYaw = yaw;
-	
+		
+	while(yaw == 0){
+		ros::spinOnce();
+	}
+	startingYaw = yaw;
+		
 	while(ros::ok()){
 		ros::spinOnce();
 		//.....**E-STOP DO NOT TOUCH**.......
@@ -213,6 +218,7 @@ int main(int argc, char **argv)
 			//-------------------rotation loop.---------------------------------------------------------------------------------------------//  	
 			
 			//-------------------Initial scan of surroundings-------------------------------------------------------------------------------//	
+				
 				if (yaw <= 0){
 					correctedYaw = (180.0-abs(yaw)) + 180.0;
 				}
@@ -222,8 +228,10 @@ int main(int argc, char **argv)
 				goalYaw = correctedYaw + desiredRotation;
 				if(goalYaw > 360.0)
 					goalYaw = goalYaw - 360.0;
-				while(abs(goalYaw-correctedYaw) > 0.1){
-					ROS_INFO("In first rotate while loop, publishing data, goalYaw: %lf, correctedYaw: %lf.\n", goalYaw, correctedYaw);
+				while(abs(goalYaw-correctedYaw) > 1){
+					ros::spinOnce();
+					
+					ROS_INFO("In first rotate while loop, publishing data, goalYaw: %lf, correctedYaw: %lf, difference: %lf.\n", goalYaw, correctedYaw, abs(goalYaw-correctedYaw));
 					
 					if (yaw <= 0){
 						correctedYaw = (180.0-abs(yaw)) + 180.0;
@@ -246,8 +254,9 @@ int main(int argc, char **argv)
 			//------------------sides are clear as well? Just so no corners are clipped. Not implemented yet. Maybe store-------------------//
 			//------------------second and third longest ranges as well. Test and see.------------------------------------------------------//
 				goalYaw = maxRangeHeading;
-				while(abs(goalYaw-correctedYaw) > 0.1){
-					ROS_INFO("In second rotate while loop, should be aligning with direction of longest range.\n");
+				while(abs(goalYaw-correctedYaw) > 1){
+					ros::spinOnce();
+					ROS_INFO("In second rotate while loop, should be aligning with direction of longest range, goalYaw: %lf, correctedYaw: %lf.\n", goalYaw, correctedYaw);
 					
 					if (yaw <= 0){
 						correctedYaw = (180.0-abs(yaw)) + 180.0;
@@ -264,9 +273,12 @@ int main(int argc, char **argv)
 			//------------------Scanning complete, robot correctly oriented, set mode to EXPLORATION for next cycle-------------------------//
 			//------------------Also reset linear and angular velocities so publish at the end doesn't publish junk-------------------------//	
 				mode = EXPLORATION;
+				
+				angular = 0;
+				linear = 0;
 				vel.angular.z = 0;
 				vel.linear.x = 0;
-			
+				vel_pub.publish(vel);
 				state = MOVE;
 
 /*
@@ -326,7 +338,8 @@ int main(int argc, char **argv)
 		vel.linear.x = linear;
 
 		vel_pub.publish(vel);
+		ROS_INFO("Starting Yaw: %lf.\n", startingYaw);
 	}
-
 	return 0;
 }
+
