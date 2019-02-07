@@ -241,6 +241,13 @@ int main(int argc, char **argv)
 				goalYaw = maxRangeHeading;
 				while(abs(goalYaw-correctedYaw) > 0.1){
 					ROS_INFO("In second rotate while loop, should be aligning with direction of longest range.\n");
+					
+					if (yaw <= 0){
+						correctedYaw = (180.0-abs(yaw)) + 180.0;
+					}
+					else
+						correctedYaw = yaw;
+
 					rotate(1,0.3);
 					
 					vel.angular.z = angular;
