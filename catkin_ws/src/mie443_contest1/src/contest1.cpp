@@ -40,14 +40,14 @@ enum{
 
 
 //-----Odometry Variables-----//
-double positionX;
-double positionY;
+double posX;
+double posY;
 double yaw;
 double pi = 3.1416;
 
 void odomCallback (const nav_msgs::Odometry::ConstPtr& msg){
-	positionX = msg->pose.pose.position.x;
-	positionY = msg->pose.pose.position.y;
+	posX = msg->pose.pose.position.x;
+	posY = msg->pose.pose.position.y;
 	yaw = (tf::getYaw(msg->pose.pose.orientation))*RAD_TO_DEG;
 
 	//ROS_INFO("Position: (%f, %f) Orientation: %f rad or %f degrees.", posX, posY, yaw, yaw*180.0/pi);
@@ -113,6 +113,20 @@ double correctedYaw;
 double temp;
 double desiredRotation;
 
+//-----Exploration Variables------//
+double tempYaw = 0;
+double initialYaw = 0;
+double tempposX = 0;
+double tempposY = 0;
+double initialposY = 0;
+double initialposX = 0;
+double laserturn = 20;
+double spiralturn = 20;
+double spiralinitialYaw = 0;
+double laserinitialYaw = 0;
+double linearDistance = 0;
+
+
 double linear = 0.0;
 double maxSpeed = 0.25;
 
@@ -159,8 +173,8 @@ void rotate(int direction, float angularSpeed){
 	//ROS_INFO("Robot turning with speed of: %lf.", angular);
 }
 
-void lineardistance(double tempposX, initialposX, tempposY, initialposY){
-	lineardistance = abs(sqrt((tempposX - initialposX)^2 + (tempposY - initialposY)^2));
+void lineardistance(double tempposX, double initialposX, double tempposY, double initialposY){
+	linearDistance = abs(sqrt((tempposX - initialposX)*(tempposX - initialposX) + (tempposY - initialposY)*(tempposY - initialposY)));
 }
 
 int main(int argc, char **argv)
@@ -285,38 +299,30 @@ int main(int argc, char **argv)
 		//Exploration Mode
 		else if(mode == EXPLORATION){
 			ROS_INFO("Position: (%f, %f) Orientation: %f degrees Range %f", posX, posY, yaw, laserRange);
-			double tempYaw = 0;
-			double initialYaw = 0;
-			double tempposX = 0;
-			double tempposY = 0;
-			double initialposY = 0;
-			double initialposX = 0;
-			double laserturn = 20;
-			double spiralturn = 20;
-			double spiralinitialYaw = 0;
-
-			if (bumperRight == 0 && bumperLeft == 0 && bumperCenter ==0){
+				if (bumperRight == 0 && bumperLeft == 0 && bumperCentre ==0){
 				ros::spinOnce();
 				tempYaw = (180 -abs(yaw)) + 180;
 				laserinitialYaw =(180-abs(yaw))+180;
-				initialPosX = posX;
-				initalPosY = posY;
+				initialposX = posX;
+				initialposY = posY;
 		//		tempYaw = round(currentYaw);
+				lineardistance(tempposX, initialposX, tempposY, initialposY);
 				if (laserRange > 0.5 && round(spiralinitialYaw) != round(tempYaw)) {
-			       		while (lineardistance (tempposX, initalposX, tempposY, initalposX) <1){
+			       		while (linearDistance < 1){
 				       		moveForward (0.25, 0);
 			    			vel.angular.z = angular;
-			 			vel.linear.x = linar;
+			 			vel.linear.x = linear;
 			 			vel_pub.publish(vel);
 			 			ros::spinOnce();
 			       			tempposX = posX;
 			       			tempposY = posY;
+						lineardistance(tempposX, initialposX, tempposY, initialposY);
 			        	}	
-			       	initalposX = tempposX;
-			       	initalposY = tempposY;
+			       	initialposX = tempposX;
+			       	initialposY = tempposY;
 				}
-				else if (laserRange <=0.5 && round(spiralinitalYaw) != round(tempYaw)){
-					while (abs(round(tempYaw) - round(laserinitalYaw)) < laserturn){
+				else if (laserRange <=0.5 && round(spiralinitialYaw) != round(tempYaw)){
+					while (abs(round(tempYaw) - round(laserinitialYaw)) < laserturn){
 						rotate(1,0.3);
 						vel.angular.z = angular;
 						vel.linear.x = linear;
@@ -328,7 +334,7 @@ int main(int argc, char **argv)
 					laserinitialYaw = round(tempYaw);
 				}
 				else if (round(spiralinitialYaw) == round(tempYaw)){
-					while (abs(round(tempYaw)-round(spiralnitialYaw)) < spiralturn && spiralturn <= 60){
+					while (abs(round(tempYaw)-round(spiralinitialYaw)) < spiralturn && spiralturn <= 60){
 						rotate(1,0.3);
 						vel.angular.z = angular;
 						vel.linear.x = linear;
@@ -337,14 +343,15 @@ int main(int argc, char **argv)
 						tempYaw = (180 - abs(yaw))+180;
 						spiralturn = spiralturn + 10;
 						if (spiralturn > 60){
-						stop();
-					}
+							stop();
+						}	
 					
-				}
+					}
 				spiralinitialYaw = (180 - abs(yaw)) + 180;
 				tempYaw = 0;
+				}
 			}
-			ROS_INFO("tempYaw: %f degrees, initialYaw: %f degrees, tempposX: %f, tempposY: %f, initialposX: %f, initialposY: %f, laserturn: %f degrees, spiralturn: %f", tempYaw, initialYaw, tempposX, tempposY, initialposX, initalposY, laserturn, spiralturn);
+			ROS_INFO("tempYaw: %f degrees, initialYaw: %f degrees, tempposX: %f, tempposY: %f, initialposX: %f, initialposY: %f, laserturn: %f degrees, spiralturn: %f", tempYaw, initialYaw, tempposX, tempposY, initialposX, initialposY, laserturn, spiralturn);
 		}	
 				
 		//ROS_INFO("Position: (%f, %f) Orientation: %f rad or %f degrees.", posX, posY, yaw, yaw*180/pi);
