@@ -27,7 +27,6 @@ enum{
 };
 
 enum{
-	//State
 	SCAN = 0,
 	ROTATE = 1,
 	MOVE = 2,
@@ -177,6 +176,21 @@ void lineardistance(double tempposX, double initialposX, double tempposY, double
 	linearDistance = abs(sqrt((tempposX - initialposX)*(tempposX - initialposX) + (tempposY - initialposY)*(tempposY - initialposY)));
 }
 
+int  turnDirection(){
+	int maxLaser=0;
+	int maxLaser_index;
+	for(int i=0; i<sizeof(laserArray);i++){
+		if(laserArray[i]>maxLaser){
+			maxLaser = laserArray[i];
+			maxLaser_index = i;
+		}
+	}
+	if(i>sizeof(laserArray)/2)
+		return RIGHT;
+	else
+		return LEFT;	
+}
+
 int main(int argc, char **argv)
 {
 	ros::init(argc, argv, "image_listener");
@@ -309,9 +323,23 @@ int main(int argc, char **argv)
 				moveForward(0.25,REGULARMODE);
 			}
 			//if distance < 0.5, rotate until distance > 1.5
-			else if(laserRange<0.5)
+			else if(laserRange<0.5 && !cornered()){
+				int turnDirection = turnDirection();
+				while(laserRange<1.5){
+					ros::spinOnce();
 
+					if(turnDirection==RIGHT)
+						rotate(RIGHT,0.2);
+					else
+						rotate(LEFT,0.2);
 
+					vel.angular.z = angular;
+					vel.linear.x = linear;
+
+					vel_pub.publish(vel);
+
+				}
+				stop();
 			}
 			//if all distance in laser array < 0.5, got to initial mode
 			else if(cornered()){
