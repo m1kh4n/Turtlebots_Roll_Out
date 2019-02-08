@@ -73,13 +73,23 @@ int laserSize = 0;
 int laserOffset = 0;
 double desiredAngle = 10.0;
 double desiredAngleRad = desiredAngle*pi/180.0;
-
+double desiredFOV = 40.0;
+double FOVOffset;
+double incrementsPerAngle;
+double rangeAngleArray[58];
 
 void laserCallback(const sensor_msgs::LaserScan::ConstPtr& msg){
 	laserSize = (msg->angle_max - msg->angle_min)/(msg->angle_increment);
 	laserOffset = desiredAngleRad/(msg->angle_increment);
+	FOVOffset = (desiredFOV/2.0)/(msg->angle_increment);
 	laserRange = 11.0;
+	incrementsPerAngle = 1.0/((msg->angle_increment)*RAD_TO_DEG);
+	int incrementsPerAngleRounded = round(incrementsPerAngle);	
 
+	for(int j = 0; j < sizeof(msg->ranges)/sizeof(msg->ranges[0]); j++){
+		if(j%incrementsPerAngleRounded == 0)
+			rangeAngleArray[j] = msg->ranges[j];
+	}
 	if(desiredAngleRad < msg->angle_max && -desiredAngleRad > msg->angle_min){
 		for(int i = laserSize/2 - laserOffset; i < laserSize/2 + laserOffset; i++){
 			if(laserRange > msg->ranges[i]){
@@ -172,6 +182,8 @@ void rotate(int direction, float angularSpeed){
 	rotateState = 1;
 	//ROS_INFO("Robot turning with speed of: %lf.", angular);
 }
+
+bool cornered();
 
 void lineardistance(double tempposX, double initialposX, double tempposY, double initialposY){
 	linearDistance = abs(sqrt((tempposX - initialposX)*(tempposX - initialposX) + (tempposY - initialposY)*(tempposY - initialposY)));
