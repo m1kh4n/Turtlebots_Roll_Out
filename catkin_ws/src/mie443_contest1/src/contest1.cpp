@@ -27,7 +27,7 @@ enum{
 };
 
 enum{
-	RIGHT =0,
+	RIGHT =-1,
 	LEFT = 1,
 };
 
@@ -69,7 +69,7 @@ double desiredAngleRad = desiredAngle*pi/180.0;
 double desiredFOV = 40.0;
 double FOVOffset;
 double incrementsPerAngle;
-double rangeAngleArray[58];
+double laserArray[58];
 
 void laserCallback(const sensor_msgs::LaserScan::ConstPtr& msg){
 	laserSize = (msg->angle_max - msg->angle_min)/(msg->angle_increment);
@@ -82,7 +82,7 @@ void laserCallback(const sensor_msgs::LaserScan::ConstPtr& msg){
 	//Store Laser Array
 	for(int j = 0; j < sizeof(msg->ranges)/sizeof(msg->ranges[0]); j++){
 		if(j%incrementsPerAngleRounded == 0)
-			rangeAngleArray[j] = msg->ranges[j];
+			laserArray[j] = msg->ranges[j];
 	}
 
 	if(desiredAngleRad < msg->angle_max && -desiredAngleRad > msg->angle_min){
@@ -109,7 +109,7 @@ void laserCallback(const sensor_msgs::LaserScan::ConstPtr& msg){
 
 //-----Movement Functions-----//
 double angular = 0.0;
-double angleSpeed=pi/12;
+double angleSpeed=pi/6;
 double startingYaw;
 double goalYaw;
 int rotateState;
@@ -154,38 +154,34 @@ void moveBackwards(){
 
 void rotate(int direction, float angularSpeed){
 	linear = 0;
-	if (direction == 1){
+	if (direction == LEFT){
 		angular = angularSpeed;
 	}
-	else if (direction == -1){
+	else if (direction == RIGHT){
 		angular = -angularSpeed;
 	}
 	rotateState = 1;
 	//ROS_INFO("Robot turning with speed of: %lf.", angular);
 }
 
-bool cornered(laserArray){
-	for (int i; i<sizeof(laserArray);i++){
+bool cornered(){
+	for (int i; i<(sizeof(laserArray))/(sizeof(laserArray[0]));i++){
 		if(laserArray[i]<0.5)
 			return true;
 	}
 	return false;
 }
 
-void lineardistance(double tempposX, double initialposX, double tempposY, double initialposY){
-	linearDistance = abs(sqrt((tempposX - initialposX)*(tempposX - initialposX) + (tempposY - initialposY)*(tempposY - initialposY)));
-}
-
-int  turnDirection(double laserArray){
+int  turnDirection(){
 	double maxLaser=0;
 	int maxLaser_index;
-	for(int i=0; i<sizeof(laserArray);i++){
+	for(int i=0; i<(sizeof(laserArray))/sizeof(laserArray[0]);i++){
 		if(laserArray[i]>maxLaser){
 			maxLaser = laserArray[i];
 			maxLaser_index = i;
 		}
 	}
-	if(i>sizeof(laserArray)/2)
+	if(maxLaser_index>((sizeof(laserArray))/(sizeof(laserArray[0])))/2)
 		return RIGHT;
 	else
 		return LEFT;	
@@ -208,6 +204,7 @@ int main(int argc, char **argv)
 	//Initialize mode
 	int mode = INITIAL;
 	int state = 0;
+	int scanCount;
 
 	while(yaw == 0){
 		ros::spinOnce();
@@ -266,7 +263,7 @@ int main(int argc, char **argv)
 					maxRange = laserRange;
 					maxRangeHeading = correctedYaw;
 				}
-				rotate(1, 0.3);
+				rotate(LEFT, 0.3);
 				vel.angular.z = angular;
 				vel.linear.x = linear;
 
@@ -287,7 +284,7 @@ int main(int argc, char **argv)
 				else
 					correctedYaw = yaw;
 
-				rotate(1,0.3);
+				rotate(LEFT,0.3);
 					
 				vel.angular.z = angular;
 				vel.linear.x = linear;
@@ -307,25 +304,43 @@ int main(int argc, char **argv)
 		//Exploration Mode
 		else if(mode == EXPLORATION){
 			//if center bumper pressed, do initial. NEED TO DOUBLE CHECK INTERRUPT
-			if(bumperCenter == 1){
+			if(bumperCentre == 1){
 				ROS_INFO("Bumper Hit");
+				while (laserRange<0.5){
+					ros::spinOnce();
+					moveBackwards();
+				}
 				mode = INITIAL;
 			}
+			//avoid clipping on left			
+			else if(laserArray[18]<0.75 && laserRange>0.5){
+				ROS_INFO("Clipping on Left, laserArray[18]: %lf\n", laserArray[18]);
+				moveForward(0.2,REGULARMODE);
+				angular=-0.2;
+			}
+			//avoid clipping on right
+			else if(laserArray[40]<0.75 && laserRange>0.5){
+				ROS_INFO("Cliping on Right");
+				moveForward(0.2,REGULARMODE);
+				angular=0.2;
+			}
+			
 			//if distance > 0.5, go forward
 			else if(laserRange>0.5){
-				ROS_INFO("Moving Foward");
 				moveForward(0.25,REGULARMODE);
+				scanCount++;
+				ROS_INFO("Moving Foward    scanCount:%d",scanCount);
 			}
 			//if distance < 0.5, rotate until distance > 1.5
-			else if(laserRange<0.5 && !cornered(rangeAngleArray)){
-				int turnDirection = turnDirection(rangeAngleArray);
+			else if(laserRange<0.5 && !cornered()){
+				int direction = turnDirection();
 				while(laserRange<1.5){
 					ros::spinOnce();
 
-					if(turnDirection==RIGHT)
-						rotate(RIGHT,0.2);
+					if(direction==RIGHT)
+						rotate(RIGHT,0.4);
 					else
-						rotate(LEFT,0.2);
+						rotate(LEFT,0.4);
 
 					vel.angular.z = angular;
 					vel.linear.x = linear;
@@ -336,7 +351,7 @@ int main(int argc, char **argv)
 				stop();
 			}
 			//if all distance in laser array < 0.5, got to initial mode
-			else if(cornered(rangeAngleArray)){
+			else if(cornered()){
 				ROS_INFO("Cornered");
 				mode=INITIAL;
 			}
@@ -345,7 +360,11 @@ int main(int argc, char **argv)
 				stop();
 			}
 
-		}	
+		}
+
+		if(scanCount<1000){
+			mode=INITIAL;
+		}
 
  		vel.angular.z = angular;
 		vel.linear.x = linear;
@@ -447,4 +466,6 @@ int main(int argc, char **argv)
 			}
 			ROS_INFO("tempYaw: %f degrees, initialYaw: %f degrees, tempposX: %f, tempposY: %f, initialposX: %f, initialposY: %f, laserturn: %f degrees, spiralturn: %f", tempYaw, initialYaw, tempposX, tempposY, initialposX, initialposY, laserturn, spiralturn);
 
-*/
+void lineardistance(double tempposX, double initialposX, double tempposY, double initialposY){
+	linearDistance = abs(sqrt((tempposX - initialposX)*(tempposX - initialposX) + (tempposY - initialposY)*(tempposY - initialposY)));
+}*/
