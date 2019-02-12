@@ -25,6 +25,7 @@ enum{
 	INITIAL = 0,
 	EXPLORATION = 1,
 	SCAN = 2,
+	TURN =3,
 };
 
 enum{
@@ -77,7 +78,7 @@ double desiredAngleRad = desiredAngle*pi/180.0;
 double desiredFOV = 40.0;
 double FOVOffset;
 double incrementsPerAngle;
-double laserArray[58];
+double laserArray[3]
 
 void laserCallback(const sensor_msgs::LaserScan::ConstPtr& msg){
 	laserSize = (msg->angle_max - msg->angle_min)/(msg->angle_increment);
@@ -88,11 +89,27 @@ void laserCallback(const sensor_msgs::LaserScan::ConstPtr& msg){
 	int incrementsPerAngleRounded = round(incrementsPerAngle);	
 	
 	//Store Laser Array
-	for(int j = 0; j < sizeof(msg->ranges)/sizeof(msg->ranges[0]); j++){
-		if(j%incrementsPerAngleRounded == 0)
-			laserArray[j] = msg->ranges[j];
+	for(int j=1;j<4;j++){
+		if(desiredAngleRad < msg->angle_max && -desiredAngleRad > msg->angle_min){
+			for(int i = laserSize/4 - laserOffset; i < laserSize/4 + laserOffset; i++){
+				if(laserArray[j-1] > msg->ranges[i]){
+					laserArray[j-1] = msg->ranges[i];
+				}
+			}
+		}
+		else{
+			for(int i = 0; i < laserSize; i++){
+				if(laserArray[j-1] > msg->ranges[i]){
+					laserArray[j-1] = msg->ranges[i];
+				}
+			}
+		}
+
+		if(laserRange == 11)
+			laserRange = 0;
 	}
 
+	//Store Laser Range
 	if(desiredAngleRad < msg->angle_max && -desiredAngleRad > msg->angle_min){
 		for(int i = laserSize/2 - laserOffset; i < laserSize/2 + laserOffset; i++){
 			if(laserRange > msg->ranges[i]){
@@ -181,28 +198,22 @@ void rotate(int direction, float angularSpeed){
 	//ROS_INFO("Robot turning with speed of: %lf.", angular);
 }
 
-bool cornered(){
-	for (int i; i<(sizeof(laserArray))/(sizeof(laserArray[0]));i++){
-		if(laserArray[i]<0.5)
-			return true;
-	}
-	return false;
-}
-
 int  turnDirection(){
-	double maxLaser=0;
-	int maxLaser_index;
-	for(int i=0; i<(sizeof(laserArray))/sizeof(laserArray[0]);i++){
-		if(laserArray[i]>maxLaser){
-			maxLaser = laserArray[i];
-			maxLaser_index = i;
-		}
-	}
-	if(maxLaser_index>((sizeof(laserArray))/(sizeof(laserArray[0])))/2)
+	if(laserArray[0]<laserArray[2]){
 		return RIGHT;
 	else
 		return LEFT;	
+	}
 }
+
+
+bool cornered(){
+	if(laserArray[0]>0.5 && laserArray[2]>0.5)
+		return true;
+	else
+		return false;
+}
+
 
 int main(int argc, char **argv)
 {
@@ -317,7 +328,7 @@ int main(int argc, char **argv)
 		//Scan Mode
 		else if(mode == SCAN){
 			//Same as inital but only scan 90 degrees
-			desiredRotation = 350.0; //Default desired rotation for scan state, allows robot to scan pretty much everything around it  	
+			desiredRotation = 90; //Default desired rotation for scan state, allows robot to scan pretty much everything around it  	
 			
 			//----------Scan needs to be able to remember the max range it found during the scan and the yaw of that----------//
 			//----------range so it can point the robot in that direction again.----------------------------------------------//
@@ -393,31 +404,44 @@ int main(int argc, char **argv)
 			vel_pub.publish(vel);
 		}
 
+		else if(mode == TURN){
+
+
+		}
+
 		//Exploration Mode
 		else if(mode == EXPLORATION){
-			//if center bumper pressed, do initial. NEED TO DOUBLE CHECK INTERRUPT
+			//if center bumper pressed, move back a little and do initial.
 			if(bumperCentre == 1){
 				ROS_INFO("Bumper Hit");
-				while (laserRange<0.75){
+				while (laserRange<0.5){
 					ros::spinOnce();
 					moveBackwards();
+
+					vel.angular.z = angular;
+					vel.linear.x = linear;
+
+					vel_pub.publish(vel);
+
 				}
 				mode = INITIAL;
 			}
-			/*
-			//avoid clipping on left			
-			else if(laserArray[18]<0.75 && laserRange>0.5){
-				ROS_INFO("Clipping on Left, laserArray[18]: %lf\n", laserArray[18]);
-				moveForward(0.2,REGULARMODE);
-				angular=-0.2;
+
+			//if left or right bumper pressed, move back a little
+			if(bumperLeft == 1 || bumperRight == 1){
+				ROS_INFO("Bumper Hit");
+				while (laserRange<0.5){
+					ros::spinOnce();
+					moveBackwards();
+
+					vel.angular.z = angular;
+					vel.linear.x = linear;
+
+					vel_pub.publish(vel);
+
+				}
 			}
-			//avoid clipping on right
-			else if(laserArray[40]<0.75 && laserRange>0.5){
-				ROS_INFO("Cliping on Right");
-				moveForward(0.2,REGULARMODE);
-				angular=0.2;
-			}
-			*/
+			
 			//if distance > 0.5, go forward
 			else if(laserRange>0.5){
 				moveForward(0.25,REGULARMODE);
@@ -436,7 +460,7 @@ int main(int argc, char **argv)
 			else if(laserRange<0.5 && !cornered()){
 				scanCount = 0;
 				int direction = turnDirection();
-				while(laserRange<1.5){
+				while(laserRange<1.0){
 					ros::spinOnce();
 
 					if(direction==RIGHT)
@@ -477,6 +501,23 @@ int main(int argc, char **argv)
 }
 
 //---------------------------------ARCHIVE-----------------------------------//
+/*
+ 			/ --------------- Decided to use yaw for control  ---------------------------------------------------------------------------/
+			//avoid clipping on left			
+			else if(laserArray[18]<0.75 && laserRange>0.5){
+				ROS_INFO("Clipping on Left, laserArray[18]: %lf\n", laserArray[18]);
+				moveForward(0.2,REGULARMODE);
+				angular=-0.2;
+			}
+			//avoid clipping on right
+			else if(laserArray[40]<0.75 && laserRange>0.5){
+				ROS_INFO("Cliping on Right");
+				moveForward(0.2,REGULARMODE);
+				angular=0.2;
+			}
+*/
+//
+//
 /*
 			/-------------- Old less efficient rotation code, works but if new code works as well, should be replaced-----------------/		
 			if(state == SCAN){
