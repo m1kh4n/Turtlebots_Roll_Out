@@ -128,11 +128,6 @@ double desiredRotation;
 double linear = 0.0;
 double maxSpeed = 0.25;
 
-struct movingForward{
-	int flag;
-	double yaw;
-};
-
 void stop(){
 	linear = 0;
 	angular = 0;
@@ -225,14 +220,17 @@ int main(int argc, char **argv)
 
 	while(yaw == 0){
 		ros::spinOnce();
-	}
-		
+	}	
+	
+	int storeForwardHeading = 0;
+	double moveForwardHeading = correctedYaw;
+	
 	while(ros::ok()){
 		ros::spinOnce();
 		//.....**E-STOP DO NOT TOUCH**.......
 		eStop.block();
-		//...................................
-		
+		//...................................		
+
 		//angular = 0.2;
 		
 		if(mode == INITIAL){
@@ -305,7 +303,8 @@ int main(int argc, char **argv)
 			//------------------Scanning complete, robot correctly oriented, set mode to EXPLORATION for next cycle-------------------------//
 			//------------------Also reset linear and angular velocities so publish at the end doesn't publish junk-------------------------//	
 			mode = EXPLORATION;
-				
+			storeForwardHeading == 1;			
+	
 			angular = 0;
 			linear = 0;
 			scanCount = 0;
@@ -384,6 +383,7 @@ int main(int argc, char **argv)
 			//------------------Scanning complete, robot correctly oriented, set mode to EXPLORATION for next cycle-------------------------//
 			//------------------Also reset linear and angular velocities so publish at the end doesn't publish junk-------------------------//	
 			mode = EXPLORATION;
+			storeForwardHeading == 1;
 				
 			angular = 0;
 			linear = 0;
@@ -422,10 +422,16 @@ int main(int argc, char **argv)
 			else if(laserRange>0.5){
 				moveForward(0.25,REGULARMODE);
 				scanCount++;
-				//if(movingForward.flag == 0){
-					//movingForward.flag = 1;
-					//movingForward.yaw = correctedYaw;
-				//}
+				if(storeForwardHeading == 1){
+					storeForwardHeading = 0;
+					moveForwardHeading = correctedYaw;
+				}
+				if((correctedYaw - moveForwardHeading) > 1){
+					angular = -0.1;
+				}
+				else if((correctedYaw - moveForwardHeading) < -1){
+					angular = 0.1;
+				}
 				if(scanCount>7500){
 					mode=SCAN;
 					scanCount = 0;
@@ -450,6 +456,7 @@ int main(int argc, char **argv)
 					vel_pub.publish(vel);
 
 				}
+				storeForwardHeading = 1;
 				stop();
 			}
 			//if all distance in laser array < 0.5, got to initial mode
