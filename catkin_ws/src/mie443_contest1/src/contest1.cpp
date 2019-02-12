@@ -24,6 +24,7 @@ enum{
 enum{
 	INITIAL = 0,
 	EXPLORATION = 1,
+	SCAN = 2,
 };
 
 enum{
@@ -36,13 +37,20 @@ enum{
 double posX;
 double posY;
 double yaw;
+double correctedYaw;
 double pi = 3.1416;
 
 void odomCallback (const nav_msgs::Odometry::ConstPtr& msg){
 	posX = msg->pose.pose.position.x;
 	posY = msg->pose.pose.position.y;
 	yaw = (tf::getYaw(msg->pose.pose.orientation))*RAD_TO_DEG;
-
+	
+	if (yaw <= 0){
+		correctedYaw = (180.0-abs(yaw)) + 180.0;
+	}
+	else
+		correctedYaw = yaw;
+			
 	//ROS_INFO("Position: (%f, %f) Orientation: %f rad or %f degrees.", posX, posY, yaw, yaw*180.0/pi);
 }
 
@@ -114,12 +122,16 @@ double startingYaw;
 double goalYaw;
 int rotateState;
 int firstRotate;
-double correctedYaw;
 double temp;
 double desiredRotation;
 
 double linear = 0.0;
 double maxSpeed = 0.25;
+
+struct movingForward{
+	int flag;
+	double yaw;
+};
 
 void stop(){
 	linear = 0;
@@ -144,6 +156,11 @@ void moveForward(float speed, int safety){
 		else
 			linear = maxSpeed;
 	}
+
+	//if not moving straight
+	//if(abs(yaw-movingForward.yaw)>1){
+		//add rotation adjustment
+	//}
 	ROS_INFO("Robot moving forward with speed of: %lf.", linear); 
 }
 
@@ -239,12 +256,7 @@ int main(int argc, char **argv)
 			
 			//-------------------Initial scan of surroundings-------------------------------------------------------------------------------//	
 				
-			if (yaw <= 0){
-				correctedYaw = (180.0-abs(yaw)) + 180.0;
-			}
-			else
-				correctedYaw = yaw;
-			
+		
 			goalYaw = correctedYaw + desiredRotation;
 			if(goalYaw > 360.0)
 				goalYaw = goalYaw - 360.0;
@@ -296,9 +308,89 @@ int main(int argc, char **argv)
 				
 			angular = 0;
 			linear = 0;
+			scanCount = 0;
 			vel.angular.z = 0;
 			vel.linear.x = 0;
 			vel_pub.publish(vel);			
+		}
+
+		//Scan Mode
+		else if(mode == SCAN){
+			//Same as inital but only scan 90 degrees
+			desiredRotation = 350.0; //Default desired rotation for scan state, allows robot to scan pretty much everything around it  	
+			
+			//----------Scan needs to be able to remember the max range it found during the scan and the yaw of that----------//
+			//----------range so it can point the robot in that direction again.----------------------------------------------//
+			double maxRange = 0; 
+			double maxRangeHeading = 0;
+
+			//-------------------New rotation code, based on while loops and modulus of 360-------------------------------------------------//
+		
+			//-------------------This code only works for rotating in one direction right now and only in the scan state, so----------------// 
+			//-------------------if we want to scan 360(or any angle) in exploration mode, state must first be set to INITIAL --------------//
+			//-------------------and then the robot will start rotating the next time it loops through the main while loop.-----------------//
+			//-------------------Further improvements can be made by adding a check for a rotation flag at the beginning of the main--------//
+			//-------------------while loop so that everytime the main loop runs, the robot checks if another part of the code--------------//
+			//-------------------has requested a rotation in the cycle before and if the flag is set as TRUE, it will execute the-----------//
+			//-------------------rotation loop.---------------------------------------------------------------------------------------------//  	
+			
+			//-------------------Initial scan of surroundings-------------------------------------------------------------------------------//	
+					
+			goalYaw = correctedYaw + desiredRotation;
+			if(goalYaw > 360.0)
+				goalYaw = goalYaw - 360.0;
+			while(abs(goalYaw-correctedYaw) > 1){
+				ros::spinOnce();
+					
+				ROS_INFO("In first rotate while loop, publishing data, goalYaw: %lf, correctedYaw: %lf, difference: %lf.\n", goalYaw, correctedYaw, abs(goalYaw-correctedYaw));
+					
+				if (yaw <= 0){
+					correctedYaw = (180.0-abs(yaw)) + 180.0;
+				}
+				else
+					correctedYaw = yaw;
+
+				if (laserRange > maxRange){
+					maxRange = laserRange;
+					maxRangeHeading = correctedYaw;
+				}
+				rotate(LEFT, 0.4);
+				vel.angular.z = angular;
+				vel.linear.x = linear;
+
+				vel_pub.publish(vel);
+			}
+				
+			//------------------Reorienting robot to the yaw which had the longest range, and maybe want to check if the--------------------//
+			//------------------sides are clear as well? Just so no corners are clipped. Not implemented yet. Maybe store-------------------//
+			//------------------second and third longest ranges as well. Test and see.------------------------------------------------------//
+			goalYaw = maxRangeHeading;
+			while(abs(goalYaw-correctedYaw) > 1){
+				ros::spinOnce();
+				ROS_INFO("In second rotate while loop, should be aligning with direction of longest range, goalYaw: %lf, correctedYaw: %lf.\n", goalYaw, correctedYaw);
+					
+				if (yaw <= 0){
+					correctedYaw = (180.0-abs(yaw)) + 180.0;
+				}
+				else
+					correctedYaw = yaw;
+
+				rotate(LEFT,0.4);
+					
+				vel.angular.z = angular;
+				vel.linear.x = linear;
+				vel_pub.publish(vel);
+			}
+			//------------------Scanning complete, robot correctly oriented, set mode to EXPLORATION for next cycle-------------------------//
+			//------------------Also reset linear and angular velocities so publish at the end doesn't publish junk-------------------------//	
+			mode = EXPLORATION;
+				
+			angular = 0;
+			linear = 0;
+			scanCount = 0;
+			vel.angular.z = 0;
+			vel.linear.x = 0;
+			vel_pub.publish(vel);
 		}
 
 		//Exploration Mode
@@ -306,12 +398,13 @@ int main(int argc, char **argv)
 			//if center bumper pressed, do initial. NEED TO DOUBLE CHECK INTERRUPT
 			if(bumperCentre == 1){
 				ROS_INFO("Bumper Hit");
-				while (laserRange<0.5){
+				while (laserRange<0.75){
 					ros::spinOnce();
 					moveBackwards();
 				}
 				mode = INITIAL;
 			}
+			/*
 			//avoid clipping on left			
 			else if(laserArray[18]<0.75 && laserRange>0.5){
 				ROS_INFO("Clipping on Left, laserArray[18]: %lf\n", laserArray[18]);
@@ -324,15 +417,24 @@ int main(int argc, char **argv)
 				moveForward(0.2,REGULARMODE);
 				angular=0.2;
 			}
-			
+			*/
 			//if distance > 0.5, go forward
 			else if(laserRange>0.5){
 				moveForward(0.25,REGULARMODE);
 				scanCount++;
-				ROS_INFO("Moving Foward    scanCount:%d",scanCount);
+				//if(movingForward.flag == 0){
+					//movingForward.flag = 1;
+					//movingForward.yaw = correctedYaw;
+				//}
+				if(scanCount>7500){
+					mode=SCAN;
+					scanCount = 0;
+				}
+				ROS_INFO("Moving Foward, scanCount:%d",scanCount);
 			}
 			//if distance < 0.5, rotate until distance > 1.5
 			else if(laserRange<0.5 && !cornered()){
+				scanCount = 0;
 				int direction = turnDirection();
 				while(laserRange<1.5){
 					ros::spinOnce();
@@ -352,6 +454,7 @@ int main(int argc, char **argv)
 			}
 			//if all distance in laser array < 0.5, got to initial mode
 			else if(cornered()){
+				scanCount = 0;
 				ROS_INFO("Cornered");
 				mode=INITIAL;
 			}
@@ -362,9 +465,7 @@ int main(int argc, char **argv)
 
 		}
 
-		if(scanCount<1000){
-			mode=INITIAL;
-		}
+
 
  		vel.angular.z = angular;
 		vel.linear.x = linear;
