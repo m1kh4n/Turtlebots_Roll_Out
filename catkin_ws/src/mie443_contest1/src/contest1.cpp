@@ -170,7 +170,7 @@ void rotate(int direction, float angularSpeed){
 	else if (direction == RIGHT){
 		angular = -angularSpeed;
 	}
-	rotateState = 1;
+	//rotateState = 1;
 	//ROS_INFO("Robot turning with speed of: %lf.", angular);
 }
 
@@ -471,7 +471,7 @@ int main(int argc, char **argv)
 			//when lost, got back to initial mode
 			else{
 				ROS_INFO("Don't know what to do");
-				mode = INITIAL
+				mode = INITIAL;
 			}
 		}
 
