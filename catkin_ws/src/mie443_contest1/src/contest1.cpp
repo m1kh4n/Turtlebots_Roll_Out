@@ -78,7 +78,7 @@ double desiredAngleRad = desiredAngle*pi/180.0;
 double desiredFOV = 40.0;
 double FOVOffset;
 double incrementsPerAngle;
-double laserArray[3]
+double laserArray[3];
 
 void laserCallback(const sensor_msgs::LaserScan::ConstPtr& msg){
 	laserSize = (msg->angle_max - msg->angle_min)/(msg->angle_increment);
@@ -194,11 +194,10 @@ void rotate(int direction, float angularSpeed){
 }
 
 int  turnDirection(){
-	if(laserArray[0]<laserArray[2]){
+	if(laserArray[0]<laserArray[2])
 		return RIGHT;
 	else
 		return LEFT;	
-	}
 }
 
 
