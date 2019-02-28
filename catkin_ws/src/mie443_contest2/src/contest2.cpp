@@ -36,8 +36,8 @@ int main(int argc, char** argv) {
     }
 
     //Part 2 - Navigate and capture image
-    float xGoal,yGoal;
-    float offsetFactor = 0.5;
+    float xGoal,yGoal,phiGoal;
+    float offsetFactor = 0.4;
     while(ros::ok()) {
         ros::spinOnce();
         /***YOUR CODE HERE***/
@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
 	*/
 	for(int i=0;i<5;i++){
 		object = seq[i];
-		phiGoal = boxes.coords[object][2];
+		phiGoal = boxes.coords[object][2]-3.14;
 		xGoal = boxes.coords[object][0]-offsetFactor*cos(phiGoal);
 		yGoal = boxes.coords[object][1]-offsetFactor*sin(phiGoal);
 		Navigation::moveToGoal(xGoal,yGoal,phiGoal);
