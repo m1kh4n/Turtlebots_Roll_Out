@@ -2,6 +2,7 @@
 #include <navigation.h>
 #include <robot_pose.h>
 #include <imagePipeline.h>
+#include <math.h>
 
 int main(int argc, char** argv) {
     // Setup ROS.
@@ -29,7 +30,14 @@ int main(int argc, char** argv) {
 
     // Execute strategy - Optimate Sequence then Navigate to catpure image
     //Part 1 - Squence Optimatization (TSP)
+    int seq[5];
+    for(int i=0;i<5;i++){
+	    seq[i]=i;
+    }
+
     //Part 2 - Navigate and capture image
+    float xGoal,yGoal;
+    float offsetFactor = 0.5;
     while(ros::ok()) {
         ros::spinOnce();
         /***YOUR CODE HERE***/
@@ -37,20 +45,15 @@ int main(int argc, char** argv) {
         - Use: boxes.coords[object index][x=0,y=1,phi=2]
         - Use: robotPose.x, robotPose.y, robotPose.phi
 	*/
-	xGoal = 0;
-	yGoal = 0;
-	phiGoal = 0;
-	
-	Navigation::moveToGoal(float xGoal, float yGoal, float phiGoal);
-
-	xGoal = 1;
-	yGoal = 1;
-	phiGoal = 1;
-
-	Navigation::moveToGoal(float xGoal, float yGoal, float phiGoal);
-
-        //imagePipeline.getTemplateID(boxes);
-        ros::Duration(0.01).sleep();
+	for(int i=0;i<5;i++){
+		object = seq[i];
+		phiGoal = boxes.coords[object][2];
+		xGoal = boxes.coords[object][0]-offsetFactor*cos(phiGoal);
+		yGoal = boxes.coords[object][1]-offsetFactor*sin(phiGoal);
+		Navigation::moveToGoal(xGoal,yGoal,phiGoal);
+		//imagePipeline.getTemplateID(boxes);
+        	ros::Duration(2).sleep();
+	}	
     }
     return 0;
 }
