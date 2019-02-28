@@ -80,7 +80,14 @@ void laserCallback(const sensor_msgs::LaserScan::ConstPtr& msg){
 	laserSize = (msg->angle_max - msg->angle_min)/(msg->angle_increment);
 	laserOffset = desiredAngleRad/(msg->angle_increment);
 	laserRange = 11.0;
+<<<<<<< HEAD
 	/*
+=======
+	laserArray[0] = 11.0;
+	laserArray[1] = 11.0;
+	laserArray[2] = 11.0;
+
+>>>>>>> 1c55cf1c76b5899c9e1c6db72f199822b5d45bf8
 	//Store Laser Array 
 	for(int j=1;j<4;j++){
 		for(int i = j*laserSize/4 - laserOffset; i < j*laserSize/4 + laserOffset; i++){
@@ -89,8 +96,8 @@ void laserCallback(const sensor_msgs::LaserScan::ConstPtr& msg){
 			}
 		}
 
-		if(laserRange == 11)
-			laserRange = 0;
+		if(laserArray[j-1] == 11)
+			laserArray[j-1] = 0;
 	}
 	*/
 
@@ -208,7 +215,7 @@ int main(int argc, char **argv)
 	//Initialize mode
 	int mode = INITIAL;
 	int state = 0;
-	int scanCount;
+	int scanCount = 0;
 
 	while(yaw == 0){
 		ros::spinOnce();
@@ -274,7 +281,7 @@ int main(int argc, char **argv)
 				else
 					correctedYaw = yaw;
 
-				rotate(LEFT,0.3);
+				rotate(LEFT,0.5);
 					
 				vel.angular.z = angular;
 				vel.linear.x = linear;
@@ -309,7 +316,7 @@ int main(int argc, char **argv)
 			while(abs(goalYaw-correctedYaw) > 1){
 				ros::spinOnce();
 					
-				ROS_INFO("In first rotate while loop, publishing data, goalYaw: %lf, correctedYaw: %lf, difference: %lf.\n", goalYaw, correctedYaw, abs(goalYaw-correctedYaw));
+				ROS_INFO("In first scan while loop, publishing data, goalYaw: %lf, correctedYaw: %lf, difference: %lf.\n", goalYaw, correctedYaw, abs(goalYaw-correctedYaw));
 					
 				if (yaw <= 0){
 					correctedYaw = (180.0-abs(yaw)) + 180.0;
@@ -331,7 +338,7 @@ int main(int argc, char **argv)
 			goalYaw = maxRangeHeading;
 			while(abs(goalYaw-correctedYaw) > 1){
 				ros::spinOnce();
-				ROS_INFO("In second rotate while loop, should be aligning with direction of longest range, goalYaw: %lf, correctedYaw: %lf.\n", goalYaw, correctedYaw);
+				ROS_INFO("In second scan while loop, should be aligning with direction of longest range, goalYaw: %lf, correctedYaw: %lf.\n", goalYaw, correctedYaw);
 					
 				if (yaw <= 0){
 					correctedYaw = (180.0-abs(yaw)) + 180.0;
@@ -371,40 +378,50 @@ int main(int argc, char **argv)
 					vel_pub.publish(vel);
 
 				}
+				scanCount = 0;
 				mode = INITIAL;
 			}
 			/*
 			//if left bumper pressed, move backwards until left distance greater than 0.5
 			else if(bumperLeft == 1){
 				ROS_INFO("Bumper Left Hit");
-				while (laserArray[0]<0.5){
+				while (laserArray[2]<0.75){
 					ros::spinOnce();
 					moveBackwards();
-
+					angular = -0.1;
+					ROS_INFO("laserArray[0] value: %lf", laserArray[0]);				
 					vel.angular.z = angular;
 					vel.linear.x = linear;
 
 					vel_pub.publish(vel);
-
+					storeForwardHeading = 1;
+					scanCount = 0;
 				}
 			}
 			
 			//if right bumper pressed, move backwards until right distance greater than 0.5
 			else if(bumperRight == 1){
 				ROS_INFO("Bumper Right Hit");
-				while (laserArray[2]<0.5){
+				while (laserArray[0]<0.75){
 					ros::spinOnce();
 					moveBackwards();
-
+					angular = 0.1;
+											
+					ROS_INFO("laserArray[0] value: %lf", laserArray[0]);
 					vel.angular.z = angular;
 					vel.linear.x = linear;
 
 					vel_pub.publish(vel);
-
+					storeForwardHeading = 1;
 				}
+				scanCount =0;
 			}
+<<<<<<< HEAD
 			*/
 
+=======
+			
+>>>>>>> 1c55cf1c76b5899c9e1c6db72f199822b5d45bf8
 			//if distance > 0.5, go forward
 			else if(laserRange>0.5){
 				moveForward(0.25,REGULARMODE);
@@ -429,15 +446,21 @@ int main(int argc, char **argv)
 				*/
 
 				//Decide when to enter scan mode by checking scanCount. scanCount is reset when enter any other condition. 
+				
 				if(scanCount>7500){
 					mode=SCAN;
 					scanCount = 0;
 				}
-				ROS_INFO("Moving Foward, scanCount:%d",scanCount);
+				//ROS_INFO("Moving Foward, scanCount:%d",scanCount);
+				ROS_INFO("Moving forward, laserArray values are: %lf, %lf, %lf, %lf", laserArray[0], laserArray[1], laserArray[2], laserRange);
 			}
 
 			//if distance < 0.5, rotate until distance > 1.5
+<<<<<<< HEAD
 			else if(laserRange<0.5){
+=======
+			else if(laserRange<0.5 /*&& !cornered()*/){
+>>>>>>> 1c55cf1c76b5899c9e1c6db72f199822b5d45bf8
 				scanCount = 0;
 				storeForwardHeading = 1;
 
@@ -450,28 +473,35 @@ int main(int argc, char **argv)
 					ros::spinOnce();
 
 					if(direction==RIGHT)
-						rotate(RIGHT,0.4);
-					else
 						rotate(LEFT,0.4);
+					else
+						rotate(RIGHT,0.4);
 
 					vel.angular.z = angular;
 					vel.linear.x = linear;
 
 					vel_pub.publish(vel);
-
+					ROS_INFO("Turning, laserArray values are: %lf, %lf, %lf, %lf", laserArray[0], laserArray[1], laserArray[2], laserRange);
 				}
+				
 
 				stop();
 				ROS_INFO("Turning to find open space");
 			}
 			/*
 			//if cornered, go to initial mode
-			else if(cornered()){
+			/*else if(cornered()){
 				scanCount = 0;
+<<<<<<< HEAD
 				ROS_INFO("Cornered");
 				mode=INITIAL;
 			}
 			*/
+=======
+				ROS_INFO("Cornered, laserArray values are: %lf, %lf, %lf, %lf", laserArray[0], laserArray[1], laserArray[2], laserRange);
+				//mode=INITIAL;
+			}*/
+>>>>>>> 1c55cf1c76b5899c9e1c6db72f199822b5d45bf8
 			
 			//when lost, got back to initial mode
 			else{
@@ -486,6 +516,8 @@ int main(int argc, char **argv)
 
 		vel_pub.publish(vel);
 		ROS_INFO("Starting Yaw: %lf.\n", startingYaw);
+		ROS_INFO("Cornered, laserArray values are: %lf, %lf, %lf, %lf", laserArray[0], laserArray[1], laserArray[2], laserRange);
+
 	}
 	return 0;
 }
