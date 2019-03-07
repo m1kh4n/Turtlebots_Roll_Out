@@ -38,6 +38,9 @@ int main(int argc, char** argv) {
     //Part 2 - Navigate and capture image
     float xGoal,yGoal,phiGoal;
     float offsetFactor = 0.4;
+    //bool rotateflag = 0
+    //int angleIncrement = 1; // 1 degree angle increment (in rad)
+    //int targetRotate = 30; // angle to which robot rotates to when in front of image to adjust position.
     while(ros::ok()) {
         ros::spinOnce();
         /***YOUR CODE HERE***/
@@ -52,6 +55,32 @@ int main(int argc, char** argv) {
 		yGoal = boxes.coords[object][1]-offsetFactor*sin(phiGoal);
 		Navigation::moveToGoal(xGoal,yGoal,phiGoal);
 		//imagePipeline.getTemplateID(boxes);
+        // assuming we get a flag from imagepipeline that image is not clear. Robot will rotate +45 and -45 degrees
+        
+       /* while (imagePipeline.getTemplateID(boxes) == -1) {
+            if (rotateflag == 0){ // rotate right
+                angleIncrement +=1;
+                phiGoal += angleIncrement*3.14/180;
+                Navigation::moveToGoal(xGoal,yGoal,phiGoal);
+                if (angleIncrement == targetRotate){ // if we have reached max rotate angle, we want to rotate left.
+                    rotateflag = 1;
+                    Navigation::moveToGoal(xGoal,yGoal,phiGoal - angleIncrement*(3.14/180)); // reset robot position to original
+                    angleIncrement = 0;
+                }
+
+            }
+            if (rotateflag == 1){ // rotate left
+                angleIncrement -= 1;
+                phiGoal += angleIncrement*3.14/180;
+                Navigation::moveToGoal(xGoal,yGoal,phiGoal);
+            }
+
+            imagepipeline.getTemplateID(boxes);
+            if (angleIncrement == (-1*targetRotate))
+                ROS_INFO("Robot has rotated both sides and cannot find image");
+            imagePipeline.getTemplateID(boxes);
+        }
+       */     
         	ros::Duration(2).sleep();
 	}	
     }
