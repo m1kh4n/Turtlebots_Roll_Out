@@ -40,7 +40,7 @@ std::vector <float> find_minPath(int unvisited[],int currentNode){
 	else{
 		float minCost = 99999;
 		float nextNode;
-		std:vector <float> minPath;
+		std::vector <float> minPath;
 		for(int i=0;i<nodes;i++){
 			if(unvisited[i]==1){
 				int newUnvisited[nodes];
@@ -56,8 +56,8 @@ std::vector <float> find_minPath(int unvisited[],int currentNode){
 			}
 		}
 		minPath.push_back(nextNode);
-		minPath[0]+=distance[nextNode][currentNode];
-		return minPath.push_back(nextNode);
+		minPath[0]+=distance[(int)nextNode][currentNode];
+		return minPath;
 	}
 }
 
