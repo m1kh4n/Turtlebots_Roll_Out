@@ -9,12 +9,12 @@
 Boxes start;
 int nodes = boxes.coords.size()+1; //Starting Point considered a node
 int startIndex = nodes-1; //Starting Point declared as the last Index
-int seq[nodes+1];
+std::vector <float> optimalPath; //Index 0 stores mininmum cost, rest of vector stores sequence
 float distance[nodes][nodes];
 float deltaX, deltaY;
 
 //Helper Functions
-float minPath(int unvisited[],int object){
+std::vector <float> find_minPath(int unvisited[],int Node){
 	//Count number of unvisited Nodes
 	int unvisitedCount=0;
        	for(int i=0;i<nodes;i++){
@@ -27,27 +27,36 @@ float minPath(int unvisited[],int object){
 	       		if(unvisited[i]==0)
 				lastUnvisited = i;
    	    	}
-		seq[nodes-unvisitedCount] = lastUnvisited;
-		return distance[object,lastUnvisited]+distance[lastUnvisited,startIndex];
-	}
+		std::vector <float> minPath;
+		minPath.push_back(distance[object,lastUnvisited]+distance[lastUnvisited,startIndex]);
+		minPath.push_back((float) startingIndex);
+		minPath.push_back((float) lastUnvisited;
+		return 	minPath;
+
 	//At Intermediate Levels of the Tree
 	else{
 		float minCost = 99999;
+		float nextNode;
 		for(int i=0;i<nodes;i++){
 			if(unvisited[i]==1){
 				int newUnvisited[nodes];
 				newUnvisited = memcpy(newUnvisited,unvisited,nodes];
 				newUnvisited[i] = 0;
-				cost = minPath(newUnvisited,i)+distance(object,i);
+				std::vector <float> minPath = find_minPath(newUnvisited,i);
+				float cost = minPath[0]+distance[Node,i];
 				if (cost<minCost){
 					minCost = cost;
-					seq[nodes-unvisitedCount] = i;
+					nextNode = i;
 				}
 			}
 		}
-		return minCost;
+		return minPath.push_back(nextNode);
 	}
 }
+
+
+
+
 
 int main(int argc, char** argv) {
     // Setup ROS.
@@ -102,17 +111,17 @@ int main(int argc, char** argv) {
 	    	    distance[i][j]=sqrt(deltaX*deltaX+deltaY*deltaY);
 	    }
     }
+
     //Shortest Sequence Algorithm Using DP
     unvisited[nodes]= {1};
-    unvisited[nodes-1] = 0;
-    seq[0] = startIndex; //First is starting position
-    seq[nodes] =startIndex; //Last location is starting position
-    totalCost = minCost(unvisited,startIndex);
+    unvisited[startIndex] = 0;
+    optimalPath  = find_minCost(unvisited,startIndex);
 
     ROS_INFO("Optimal Sequence: ");
-    for(int i=0;i<nodes+1;i++){
-	    ROS_INFO("
+    for(int i=1;i<optimalPath.size();i++){
+	    ROS_INFO("%f",optimalPath[i]);
     }
+    ROS_INFO("Minimum Cost: %f", optimalPath[0]);
 
     /*
     //For Testing Navigation
@@ -176,3 +185,43 @@ int main(int argc, char** argv) {
     }
     return 0;
 }
+
+/* -------------------------------------------ARCHIVE--------------------------------------------
+
+ //Original Shortest Path Algorithm using C
+ float minPath(int unvisited[],int object){
+	//Count number of unvisited Nodes
+	int unvisitedCount=0;
+       	for(int i=0;i<nodes;i++){
+	       	unvisitedCount+=unvisited[i];
+       	}
+	//At Bottom of the Tree
+	if(unvisitedCount==1){
+		int lastUnvisited;
+		for(int i=0;i<nodes;i++){
+	       		if(unvisited[i]==0)
+				lastUnvisited = i;
+   	    	}
+		seq[nodes-unvisitedCount] = lastUnvisited;
+		return distance[object,lastUnvisited]+distance[lastUnvisited,startIndex];
+	}
+	//At Intermediate Levels of the Tree
+	else{
+		float minCost = 99999;
+		for(int i=0;i<nodes;i++){
+			if(unvisited[i]==1){
+				int newUnvisited[nodes];
+				newUnvisited = memcpy(newUnvisited,unvisited,nodes);
+				newUnvisited[i] = 0;
+				cost = minPath(newUnvisited,i)+distance[object,i];
+				if (cost<minCost){
+					minCost = 
+					seq[nodes-unvisitedCount] = i;
+				}
+			}
+		}
+		return minCost;
+	}
+}
+ */
+
