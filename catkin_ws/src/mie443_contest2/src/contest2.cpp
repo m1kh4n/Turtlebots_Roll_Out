@@ -16,7 +16,7 @@ float distance[nodes][nodes];
 float deltaX, deltaY;
 
 //Helper Functions
-std::vector <float> find_minPath(int unvisited[],int Node){
+std::vector <float> find_minPath(int unvisited[],int currentNode){
 	//Count number of unvisited Nodes
 	int unvisitedCount=0;
        	for(int i=0;i<nodes;i++){
@@ -30,7 +30,7 @@ std::vector <float> find_minPath(int unvisited[],int Node){
 				lastUnvisited = i;
    	    	}
 		std::vector <float> minPath;
-		minPath.push_back(distance[Node][lastUnvisited]+distance[lastUnvisited][startIndex]);
+		minPath.push_back(distance[currentNode][lastUnvisited]+distance[lastUnvisited][startIndex]);
 		minPath.push_back((float) startIndex);
 		minPath.push_back((float) lastUnvisited);
 		return 	minPath;
@@ -40,19 +40,23 @@ std::vector <float> find_minPath(int unvisited[],int Node){
 	else{
 		float minCost = 99999;
 		float nextNode;
+		std:vector <float> minPath;
 		for(int i=0;i<nodes;i++){
 			if(unvisited[i]==1){
 				int newUnvisited[nodes];
 				memcpy(newUnvisited,unvisited,nodes);
 				newUnvisited[i] = 0;
-				std::vector <float> minPath = find_minPath(newUnvisited,i);
-				float cost = minPath[0]+distance[Node][i];
+				std::vector <float> currentPath = find_minPath(newUnvisited,i);
+				float cost = minPath[0]+distance[currentNode][i];
 				if (cost<minCost){
 					minCost = cost;
 					nextNode = i;
+					minPath = currentPath;
 				}
 			}
 		}
+		minPath.push_back(nextNode);
+		minPath[0]+=distance[nextNode][currentNode];
 		return minPath.push_back(nextNode);
 	}
 }
