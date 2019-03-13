@@ -118,6 +118,7 @@ if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
   include("/home/albertliu/Turtlebots_Roll_Out/catkin_ws/build/gtest/cmake_install.cmake")
   include("/home/albertliu/Turtlebots_Roll_Out/catkin_ws/build/mie443_contest1/cmake_install.cmake")
+  include("/home/albertliu/Turtlebots_Roll_Out/catkin_ws/build/mie443_contest2/cmake_install.cmake")
 
 endif()
 

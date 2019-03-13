@@ -4,11 +4,12 @@
 #include <imagePipeline.h>
 #include <math.h>
 #include <string.h>
+#include <iostream>
 
 //Global Variables
 Boxes start;
 Boxes boxes;
-int nodes = 6; //Starting Point considered a node
+const int nodes = 6; //Starting Point considered a node
 int startIndex = nodes-1; //Starting Point declared as the last Index
 std::vector <float> optimalPath; //Index 0 stores mininmum cost, rest of vector stores sequence
 float distance[nodes][nodes];
@@ -29,10 +30,11 @@ std::vector <float> find_minPath(int unvisited[],int Node){
 				lastUnvisited = i;
    	    	}
 		std::vector <float> minPath;
-		minPath.push_back(distance[Node,lastUnvisited]+distance[lastUnvisited,startIndex]);
-		minPath.push_back((float) startingIndex);
+		minPath.push_back(distance[Node][lastUnvisited]+distance[lastUnvisited][startIndex]);
+		minPath.push_back((float) startIndex);
 		minPath.push_back((float) lastUnvisited);
 		return 	minPath;
+	}
 
 	//At Intermediate Levels of the Tree
 	else{
@@ -41,10 +43,10 @@ std::vector <float> find_minPath(int unvisited[],int Node){
 		for(int i=0;i<nodes;i++){
 			if(unvisited[i]==1){
 				int newUnvisited[nodes];
-				newUnvisited = memcpy(newUnvisited,unvisited,nodes);
+				memcpy(newUnvisited,unvisited,nodes);
 				newUnvisited[i] = 0;
 				std::vector <float> minPath = find_minPath(newUnvisited,i);
-				float cost = minPath[0]+distance[Node,i];
+				float cost = minPath[0]+distance[Node][i];
 				if (cost<minCost){
 					minCost = cost;
 					nextNode = i;
@@ -109,7 +111,7 @@ int main(int argc, char** argv) {
     }
 
     //Shortest Sequence Algorithm Using DP
-    unvisited[nodes]= {1};
+    int unvisited[nodes]= {1};
     unvisited[startIndex] = 0;
     optimalPath  = find_minPath(unvisited,startIndex);
 

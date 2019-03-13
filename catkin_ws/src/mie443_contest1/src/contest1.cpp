@@ -80,14 +80,10 @@ void laserCallback(const sensor_msgs::LaserScan::ConstPtr& msg){
 	laserSize = (msg->angle_max - msg->angle_min)/(msg->angle_increment);
 	laserOffset = desiredAngleRad/(msg->angle_increment);
 	laserRange = 11.0;
-<<<<<<< HEAD
-	/*
-=======
 	laserArray[0] = 11.0;
 	laserArray[1] = 11.0;
 	laserArray[2] = 11.0;
 
->>>>>>> 1c55cf1c76b5899c9e1c6db72f199822b5d45bf8
 	//Store Laser Array 
 	for(int j=1;j<4;j++){
 		for(int i = j*laserSize/4 - laserOffset; i < j*laserSize/4 + laserOffset; i++){
@@ -99,7 +95,7 @@ void laserCallback(const sensor_msgs::LaserScan::ConstPtr& msg){
 		if(laserArray[j-1] == 11)
 			laserArray[j-1] = 0;
 	}
-	*/
+	
 
 	//Store Laser Range
 	if(desiredAngleRad < msg->angle_max && -desiredAngleRad > msg->angle_min){
@@ -381,7 +377,7 @@ int main(int argc, char **argv)
 				scanCount = 0;
 				mode = INITIAL;
 			}
-			/*
+			
 			//if left bumper pressed, move backwards until left distance greater than 0.5
 			else if(bumperLeft == 1){
 				ROS_INFO("Bumper Left Hit");
@@ -416,12 +412,7 @@ int main(int argc, char **argv)
 				}
 				scanCount =0;
 			}
-<<<<<<< HEAD
-			*/
-
-=======
 			
->>>>>>> 1c55cf1c76b5899c9e1c6db72f199822b5d45bf8
 			//if distance > 0.5, go forward
 			else if(laserRange>0.5){
 				moveForward(0.25,REGULARMODE);
@@ -456,11 +447,7 @@ int main(int argc, char **argv)
 			}
 
 			//if distance < 0.5, rotate until distance > 1.5
-<<<<<<< HEAD
-			else if(laserRange<0.5){
-=======
 			else if(laserRange<0.5 /*&& !cornered()*/){
->>>>>>> 1c55cf1c76b5899c9e1c6db72f199822b5d45bf8
 				scanCount = 0;
 				storeForwardHeading = 1;
 
@@ -490,18 +477,11 @@ int main(int argc, char **argv)
 			}
 			/*
 			//if cornered, go to initial mode
-			/*else if(cornered()){
+			else if(cornered()){
 				scanCount = 0;
-<<<<<<< HEAD
-				ROS_INFO("Cornered");
-				mode=INITIAL;
-			}
-			*/
-=======
 				ROS_INFO("Cornered, laserArray values are: %lf, %lf, %lf, %lf", laserArray[0], laserArray[1], laserArray[2], laserRange);
 				//mode=INITIAL;
 			}*/
->>>>>>> 1c55cf1c76b5899c9e1c6db72f199822b5d45bf8
 			
 			//when lost, got back to initial mode
 			else{
