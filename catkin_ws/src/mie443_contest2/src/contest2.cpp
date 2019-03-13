@@ -7,40 +7,41 @@
 
 //Global Variables
 Boxes start;
-int startIndex = boxes.coords.size();
-int seq[boxes.coords.size()+1];
-float distance[boxes.coords.size()+1][boxes.coords.size()+1];
+int nodes = boxes.coords.size()+1; //Starting Point considered a node
+int startIndex = nodes-1; //Starting Point declared as the last Index
+int seq[nodes+1];
+float distance[nodes][nodes];
 float deltaX, deltaY;
 
 //Helper Functions
 float minPath(int unvisited[],int object){
 	//Count number of unvisited Nodes
 	int unvisitedCount=0;
-       	for(int i=0;i<sizeof(unvisited)/sizeof(int);i++){
+       	for(int i=0;i<nodes;i++){
 	       	unvisitedCount+=unvisited[i];
        	}
 	//At Bottom of the Tree
 	if(unvisitedCount==1){
 		int lastUnvisited;
-		for(int i=0;i<sizeof(unvisited)/sizeof(int);i++){
+		for(int i=0;i<nodes;i++){
 	       		if(unvisited[i]==0)
 				lastUnvisited = i;
    	    	}
-		seq[boxes.coords.size()-1] = lastUnvisited;
-		return distance[object,lastUnvisited]+distance[lastUnvisited,boxes.coords.size()];
+		seq[nodes-unvisitedCount] = lastUnvisited;
+		return distance[object,lastUnvisited]+distance[lastUnvisited,startIndex];
 	}
 	//At Intermediate Levels of the Tree
 	else{
 		float minCost = 99999;
-		for(int i=0;i<sizeof(unvisited)/sizeof(int);i++){
+		for(int i=0;i<nodes;i++){
 			if(unvisited[i]==1){
-				int newUnvisited[boxes.coords.size()+1];
-				newUnvisited = memcpy(newUnvisited,unvisited,boxes.coords.size()+1];
+				int newUnvisited[nodes];
+				newUnvisited = memcpy(newUnvisited,unvisited,nodes];
 				newUnvisited[i] = 0;
 				cost = minPath(newUnvisited,i)+distance(object,i);
 				if (cost<minCost){
 					minCost = cost;
-					seq[boxes.coords.size()-unvisitedCount] = i;
+					seq[nodes-unvisitedCount] = i;
 				}
 			}
 		}
@@ -79,18 +80,18 @@ int main(int argc, char** argv) {
     float startPhi = robotPose.phi;
 
     //Initialize Distance Map
-    for(int i=0;i<boxes.coords.size+1;i++){
-	    for(int j=0;j<boxes.coords.size+1;j++){
+    for(int i=0;i<nodes;i++){
+	    for(int j=0;j<nodes;j++){
 		    if(i==j){
 			    deltaX=0;
 			    deltaY=0;
 		    }		  
-		    else if(i==boxes.coords.size()){
+		    else if(i==startIndex){
 			    deltaX = startX - boxes.coords[j][0];
 			    deltaY = startY - boxes.coords[j][1];
 				
 		    }
-		    else if(j==boxes.coords.size()){
+		    else if(j==startIndex){
 			    deltaX=boxes.coords[i][0]-startX;
 			    deltaY=boxes.coords[i][1]-startY;
 		    }
@@ -102,10 +103,16 @@ int main(int argc, char** argv) {
 	    }
     }
     //Shortest Sequence Algorithm Using DP
-    unvisited[boxes.coords.size()+1]= {1};
-    seq[0] = startIndex;
-    seq[boxes.coords.size()]=startIndex;
+    unvisited[nodes]= {1};
+    unvisited[nodes-1] = 0;
+    seq[0] = startIndex; //First is starting position
+    seq[nodes] =startIndex; //Last location is starting position
     totalCost = minCost(unvisited,startIndex);
+
+    ROS_INFO("Optimal Sequence: ");
+    for(int i=0;i<nodes+1;i++){
+	    ROS_INFO("
+    }
 
     /*
     //For Testing Navigation
@@ -127,7 +134,7 @@ int main(int argc, char** argv) {
         - Use: boxes.coords[object index][x=0,y=1,phi=2]
         - Use: robotPose.x, robotPose.y, robotPose.phi
 	*/
-	for(int i=0;i<boxes.coords.size();i++){
+	for(int i=1;i<nodes;i++){
 		object = seq[i];
 		phiGoal = boxes.coords[object][2]-3.14;
 		xGoal = boxes.coords[object][0]-offsetFactor*cos(phiGoal);
@@ -159,10 +166,12 @@ int main(int argc, char** argv) {
                 ROS_INFO("Robot has rotated both sides and cannot find image");
             imagePipeline.getTemplateID(boxes);
         }
-       */     
+       */   
         	ros::Duration(2).sleep();
 	}
 
+	//Move Back to Starting Position
+	Navigation::moveToGoal(startX,startY,startPhi);
 
     }
     return 0;
