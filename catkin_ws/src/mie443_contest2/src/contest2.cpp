@@ -7,6 +7,7 @@
 
 //Global Variables
 Boxes start;
+Boxes boxes;
 int nodes = boxes.coords.size()+1; //Starting Point considered a node
 int startIndex = nodes-1; //Starting Point declared as the last Index
 std::vector <float> optimalPath; //Index 0 stores mininmum cost, rest of vector stores sequence
@@ -28,9 +29,9 @@ std::vector <float> find_minPath(int unvisited[],int Node){
 				lastUnvisited = i;
    	    	}
 		std::vector <float> minPath;
-		minPath.push_back(distance[object,lastUnvisited]+distance[lastUnvisited,startIndex]);
+		minPath.push_back(distance[Node,lastUnvisited]+distance[lastUnvisited,startIndex]);
 		minPath.push_back((float) startingIndex);
-		minPath.push_back((float) lastUnvisited;
+		minPath.push_back((float) lastUnvisited);
 		return 	minPath;
 
 	//At Intermediate Levels of the Tree
@@ -40,7 +41,7 @@ std::vector <float> find_minPath(int unvisited[],int Node){
 		for(int i=0;i<nodes;i++){
 			if(unvisited[i]==1){
 				int newUnvisited[nodes];
-				newUnvisited = memcpy(newUnvisited,unvisited,nodes];
+				newUnvisited = memcpy(newUnvisited,unvisited,nodes);
 				newUnvisited[i] = 0;
 				std::vector <float> minPath = find_minPath(newUnvisited,i);
 				float cost = minPath[0]+distance[Node,i];
@@ -54,10 +55,6 @@ std::vector <float> find_minPath(int unvisited[],int Node){
 	}
 }
 
-
-
-
-
 int main(int argc, char** argv) {
     // Setup ROS.
     ros::init(argc, argv, "contest2");
@@ -68,7 +65,6 @@ int main(int argc, char** argv) {
     ros::Subscriber amclSub = n.subscribe("/amcl_pose", 1, &RobotPose::poseCallback, &robotPose);
 
     // Initialize box coordinates and templates
-    Boxes boxes; 
     if(!boxes.load_coords() || !boxes.load_templates()) {
         std::cout << "ERROR: could not load coords or templates" << std::endl;
         return -1;
@@ -115,7 +111,7 @@ int main(int argc, char** argv) {
     //Shortest Sequence Algorithm Using DP
     unvisited[nodes]= {1};
     unvisited[startIndex] = 0;
-    optimalPath  = find_minCost(unvisited,startIndex);
+    optimalPath  = find_minPath(unvisited,startIndex);
 
     ROS_INFO("Optimal Sequence: ");
     for(int i=1;i<optimalPath.size();i++){
@@ -143,8 +139,9 @@ int main(int argc, char** argv) {
         - Use: boxes.coords[object index][x=0,y=1,phi=2]
         - Use: robotPose.x, robotPose.y, robotPose.phi
 	*/
-	for(int i=1;i<nodes;i++){
-		object = seq[i];
+	int object;
+	for(int i=1;i<optimalPath.size();i++){
+		object =(int) optimalPath[i];
 		phiGoal = boxes.coords[object][2]-3.14;
 		xGoal = boxes.coords[object][0]-offsetFactor*cos(phiGoal);
 		yGoal = boxes.coords[object][1]-offsetFactor*sin(phiGoal);
