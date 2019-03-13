@@ -8,7 +8,7 @@
 //Global Variables
 Boxes start;
 Boxes boxes;
-int nodes =(int)boxes.coords.size()+1; //Starting Point considered a node
+int nodes = 6; //Starting Point considered a node
 int startIndex = nodes-1; //Starting Point declared as the last Index
 std::vector <float> optimalPath; //Index 0 stores mininmum cost, rest of vector stores sequence
 float distance[nodes][nodes];
