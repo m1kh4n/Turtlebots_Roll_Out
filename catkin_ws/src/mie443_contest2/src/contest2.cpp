@@ -154,7 +154,7 @@ int main(int argc, char** argv) {
 		Navigation::moveToGoal(xGoal,yGoal,phiGoal);
 		//imagePipeline.getTemplateID(boxes);
         // assuming we get a flag from imagepipeline that image is not clear. Robot will rotate +45 and -45 degrees
-        
+     /*   
      while (imagePipeline.getTemplateID(boxes) == -1) {
             if (rotateflag == 0){ // rotate right
                 angleIncrement +=1;
@@ -181,7 +181,7 @@ int main(int argc, char** argv) {
         
         	ros::Duration(2).sleep();
 	}
-
+*/
 	//Move Back to Starting Position
 	Navigation::moveToGoal(startX,startY,startPhi);
 
