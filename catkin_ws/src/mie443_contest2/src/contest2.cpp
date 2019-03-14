@@ -1,3 +1,6 @@
+//#define CALCULATE_SHORTEST 1
+//#define MOVEMENT 1
+
 #include <boxes.h>
 #include <navigation.h>
 #include <robot_pose.h>
@@ -113,7 +116,7 @@ int main(int argc, char** argv) {
 	    	    distance[i][j]=sqrt(deltaX*deltaX+deltaY*deltaY);
 	    }
     }
-
+#ifdef CALCULATE_SHORTEST
     //Shortest Sequence Algorithm Using DP
     int unvisited[nodes]= {1};
     unvisited[startIndex] = 0;
@@ -124,7 +127,7 @@ int main(int argc, char** argv) {
 	    ROS_INFO("%f",optimalPath[i]);
     }
     ROS_INFO("Minimum Cost: %f", optimalPath[0]);
-
+#endif
     /*
     //For Testing Navigation
     for(int i=0;i<5;i++){
@@ -145,6 +148,7 @@ int main(int argc, char** argv) {
         - Use: boxes.coords[object index][x=0,y=1,phi=2]
         - Use: robotPose.x, robotPose.y, robotPose.phi
 	*/
+#ifdef MOVEMENT
 	int object;
 	for(int i=1;i<optimalPath.size();i++){
 		object =(int) optimalPath[i];
@@ -184,7 +188,9 @@ int main(int argc, char** argv) {
 
 	//Move Back to Starting Position
 	Navigation::moveToGoal(startX,startY,startPhi);
-
+#endif
+	imagePipeline.getTemplateID(boxes);
+	ros::Duration(1).sleep();
     }
     return 0;
 }
