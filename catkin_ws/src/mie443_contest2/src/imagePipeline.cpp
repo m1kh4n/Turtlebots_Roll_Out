@@ -35,6 +35,9 @@ int ImagePipeline::getTemplateID(Boxes& boxes) {
     } else {
         /***YOUR CODE HERE***/
         // Use: boxes.templates
+	Mat RaisinBran = boxes.templates[0];
+	Mat Cinnamon = boxes.templates[1];
+	Mat Rice = boxes.templates[2];
         cv::imshow("view", img);
         cv::waitKey(10);
     }  
