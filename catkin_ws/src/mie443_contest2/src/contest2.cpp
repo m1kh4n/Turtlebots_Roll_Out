@@ -15,53 +15,63 @@ Boxes boxes;
 const int nodes = 6; //Starting Point considered a node
 int startIndex = nodes-1; //Starting Point declared as the last Index
 std::vector <float> optimalPath; //Index 0 stores mininmum cost, rest of vector stores sequence
-float distance[nodes][nodes];
+float costMap[nodes][nodes];
 float deltaX, deltaY;
 
 //Helper Functions
 std::vector <float> find_minPath(int unvisited[],int currentNode){
-	//Count number of unvisited Nodes
-	int unvisitedCount=0;
-       	for(int i=0;i<nodes;i++){
-	       	unvisitedCount+=unvisited[i];
-       	}
-	//At Bottom of the Tree
-	if(unvisitedCount==1){
-		int lastUnvisited;
-		for(int i=0;i<nodes;i++){
-	       		if(unvisited[i]==0)
-				lastUnvisited = i;
-   	    	}
-		std::vector <float> minPath;
-		minPath.push_back(distance[currentNode][lastUnvisited]+distance[lastUnvisited][startIndex]);
-		minPath.push_back((float) startIndex);
-		minPath.push_back((float) lastUnvisited);
-		return 	minPath;
-	}
-
-	//At Intermediate Levels of the Tree
-	else{
-		float minCost = 99999;
-		float nextNode;
-		std::vector <float> minPath;
-		for(int i=0;i<nodes;i++){
-			if(unvisited[i]==1){
-				int newUnvisited[nodes];
-				memcpy(newUnvisited,unvisited,nodes);
-				newUnvisited[i] = 0;
-				std::vector <float> currentPath = find_minPath(newUnvisited,i);
-				float cost = minPath[0]+distance[currentNode][i];
-				if (cost<minCost){
-					minCost = cost;
-					nextNode = i;
-					minPath = currentPath;
-				}
-			}
-		}
-		minPath.push_back(nextNode);
-		minPath[0]+=distance[(int)nextNode][currentNode];
-		return minPath;
-	}
+    //Count number of unvisited Nodes
+    int unvisitedCount=0;
+    for(int i=0;i<nodes;i++){
+        unvisitedCount+=unvisited[i];
+    }
+    //At Bottom of the Tree
+    if(unvisitedCount==1){
+        int lastUnvisited;
+        for(int i=0;i<nodes;i++){
+            if(unvisited[i]==1)
+                lastUnvisited = i;
+        }
+        std::vector <float> minPath;
+        minPath.push_back(costMap[currentNode][lastUnvisited]+costMap[lastUnvisited][startIndex]);
+        minPath.push_back((float) startIndex);
+        minPath.push_back((float) lastUnvisited);
+        return minPath;
+    }
+    
+    //At Intermediate Levels of the Tree
+    else{
+        //Initialize minCost to large cost and next optimal node as nextNode
+        float minCost = 99999;
+        float nextNode;
+        std::vector <float> minPath;
+        for(int i=0;i<nodes;i++){
+            if(unvisited[i]==1){
+                //Initialize newUnvisited Array for branch
+                int newUnvisited[nodes];
+                for(int j=0;j<nodes;j++){
+                    newUnvisited[j]=unvisited[j];
+                }
+                newUnvisited[i] = 0;
+                //Find cost of current path
+                std::vector <float> currentPath = find_minPath(newUnvisited,i);
+                float cost = currentPath[0]+costMap[currentNode][i];
+                //If current path more optimal, store it
+                if (cost<minCost){
+                    minCost = cost;
+                    nextNode = i;
+                    minPath = currentPath;
+                }
+            }
+        }
+        //Update minPath
+        minPath.push_back(nextNode);
+        minPath[0]+=costMap[(int)nextNode][currentNode];
+        if (unvisitedCount==nodes-1)
+            minPath.push_back(startIndex);
+        
+        return minPath;
+    }
 }
 
 int main(int argc, char** argv) {
@@ -113,12 +123,15 @@ int main(int argc, char** argv) {
 			  deltaX=boxes.coords[i][0]-boxes.coords[j][0];
 			  deltaY=boxes.coords[i][1]-boxes.coords[j][1];
 		    }
-	    	    distance[i][j]=sqrt(deltaX*deltaX+deltaY*deltaY);
+	    	    costMap[i][j]=sqrt(deltaX*deltaX+deltaY*deltaY);
 	    }
     }
 #ifdef CALCULATE_SHORTEST
     //Shortest Sequence Algorithm Using DP
-    int unvisited[nodes]= {1};
+    int unvisited[nodes];
+    for (int i=0; i<nodes;i++){
+        unvisited[i]=1;
+    }
     unvisited[startIndex] = 0;
     optimalPath  = find_minPath(unvisited,startIndex);
 
@@ -150,7 +163,7 @@ int main(int argc, char** argv) {
 	*/
 #ifdef MOVEMENT
 	int object;
-	for(int i=1;i<optimalPath.size();i++){
+	for(int i=1;i<optimalPath.size()-1;i++){
 		object =(int) optimalPath[i];
 		phiGoal = boxes.coords[object][2]-3.14;
 		xGoal = boxes.coords[object][0]-offsetFactor*cos(phiGoal);
