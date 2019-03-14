@@ -8,6 +8,7 @@
 #include <math.h>
 #include <string.h>
 #include <iostream>
+#include <fstream>
 
 //Global Variables
 Boxes start;
@@ -17,6 +18,9 @@ int startIndex = nodes-1; //Starting Point declared as the last Index
 std::vector <float> optimalPath; //Index 0 stores mininmum cost, rest of vector stores sequence
 float costMap[nodes][nodes];
 float deltaX, deltaY;
+int locationTag[nodes-1];
+const float scanRange = 45*3.14/180; //Scans 45 degrees in each direction
+const float scanIncrement = 5*3.14/180;
 
 //Helper Functions
 std::vector <float> find_minPath(int unvisited[],int currentNode){
@@ -164,53 +168,53 @@ int main(int argc, char** argv) {
 #ifdef MOVEMENT
 	int object;
 	for(int i=1;i<optimalPath.size()-1;i++){
+        //Calculate where to navigate to
 		object =(int) optimalPath[i];
 		phiGoal = boxes.coords[object][2]-3.14;
 		xGoal = boxes.coords[object][0]-offsetFactor*cos(phiGoal);
 		yGoal = boxes.coords[object][1]-offsetFactor*sin(phiGoal);
-		Navigation::moveToGoal(xGoal,yGoal,phiGoal);
-		//imagePipeline.getTemplateID(boxes);
-        // assuming we get a flag from imagepipeline that image is not clear. Robot will rotate +45 and -45 degrees
-        
-       /* while (imagePipeline.getTemplateID(boxes) == -1) {
-            if (rotateflag == 0){ // rotate right
-                angleIncrement +=1;
-                phiGoal += angleIncrement*3.14/180;
-                Navigation::moveToGoal(xGoal,yGoal,phiGoal);
-                if (angleIncrement == targetRotate){ // if we have reached max rotate angle, we want to rotate left.
-                    rotateflag = 1;
-                    Navigation::moveToGoal(xGoal,yGoal,phiGoal - angleIncrement*(3.14/180)); // reset robot position to original
-                    angleIncrement = 0;
-                }
 
-            }
-            if (rotateflag == 1){ // rotate left
-                angleIncrement -= 1;
-                phiGoal += angleIncrement*3.14/180;
-                Navigation::moveToGoal(xGoal,yGoal,phiGoal);
-            }
-
-            imagepipeline.getTemplateID(boxes);
-            if (angleIncrement == (-1*targetRotate))
-                ROS_INFO("Robot has rotated both sides and cannot find image");
-            imagePipeline.getTemplateID(boxes);
+        //Navigate to Oject and Scan Images
+        int scanData[4]={0};
+        int scanData_index=0;
+        int currentTag;
+        for (float phiOffset=-scanRange;phiOffset<scanRange;phiOffset+=scanIncrement){
+            Navigation::moveToGoal(xGoal,yGoal,phiGoal+phiOffset);
+            currentTag=imagePipeline.getTemplateID(boxes);
+            ROS_INFO("Scan %d: Tag = %d",scanData_index,currentTag)
+            scanData_index++;
+            scanData[currenTag]++;
         }
-       */   
-        	ros::Duration(2).sleep();
+        
+        //Store most likely Tag
+        locationTag[object]=std::max_element(scanData,scanData+4);
+        ROS_INFO("At box %d, Tag Determined to be %d",object,locationTag[object]);
+        ros::Duration(2).sleep();
 	}
 
-	//Move Back to Starting Position
+	//Move Back to Starting Position and Output file
 	Navigation::moveToGoal(startX,startY,startPhi);
 #endif
-	imagePipeline.getTemplateID(boxes);
-	ros::Duration(1).sleep();
+        ofstream resultFile;
+        resultFile.open("Contest2_Results");
+        for(int i;i<nodes-1;i++){
+            resultFile <<"Box " << i << "->";
+            switch(locationTag[i]){
+                case 0: resultFile << "Cereal 2 \n"; break;
+                case 1: resultFile << "Cereal 2 \n"; break;
+                case 2: resultFile << "Cereal 3"; break;
+                case 3: resultFile << "Empty \n"; break;
+            }
+        }
+        resultFile.close();
+        
+	ros::Duration(100).sleep();
     }
     return 0;
 }
 
 /* -------------------------------------------ARCHIVE--------------------------------------------
-
- //Original Shortest Path Algorithm using C
+1. Shortest Path Algorithum using C
  float minPath(int unvisited[],int object){
 	//Count number of unvisited Nodes
 	int unvisitedCount=0;
@@ -245,5 +249,32 @@ int main(int argc, char** argv) {
 		return minCost;
 	}
 }
+
+2. Rotation Code
+ // assuming we get a flag from imagepipeline that image is not clear. Robot will rotate +45 and -45 degrees
+ 
+ /* while (scanComplete==0) {
+ if (rotateflag == 0){ // rotate right
+ angleIncrement +=5*3.14/180;
+ Navigation::moveToGoal(xGoal,yGoal,phiGoal+angleIncrement);
+ if (angleIncrement == targetRotate){ // if we have reached max rotate angle, we want to rotate left.
+ rotateflag = 1;
+ angleIncrement = 0;
+ }
+ 
+ }
+ if (rotateflag == 1){ // rotate left
+ angleIncrement -= 1f;
+ phiGoal += angleIncrement*3.14/180;
+ Navigation::moveToGoal(xGoal,yGoal,phiGoal);
+ if(angleIncre
+ }
+ 
+ imagepipeline.getTemplateID(boxes);
+ if (angleIncrement == (-1*targetRotate))
+ ROS_INFO("Robot has rotated both sides and cannot find image");
+ imagePipeline.getTemplateID(boxes);
+ }
+ */
  */
 
