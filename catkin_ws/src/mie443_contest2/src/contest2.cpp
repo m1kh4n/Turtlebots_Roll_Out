@@ -155,7 +155,7 @@ int main(int argc, char** argv) {
 		//imagePipeline.getTemplateID(boxes);
         // assuming we get a flag from imagepipeline that image is not clear. Robot will rotate +45 and -45 degrees
         
-       /* while (imagePipeline.getTemplateID(boxes) == -1) {
+     while (imagePipeline.getTemplateID(boxes) == -1) {
             if (rotateflag == 0){ // rotate right
                 angleIncrement +=1;
                 phiGoal += angleIncrement*3.14/180;
@@ -178,7 +178,7 @@ int main(int argc, char** argv) {
                 ROS_INFO("Robot has rotated both sides and cannot find image");
             imagePipeline.getTemplateID(boxes);
         }
-       */   
+        
         	ros::Duration(2).sleep();
 	}
 
