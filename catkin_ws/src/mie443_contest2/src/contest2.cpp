@@ -200,7 +200,7 @@ int main(int argc, char** argv) {
         for(int i;i<nodes-1;i++){
             resultFile <<"Box " << i << "->";
             switch(locationTag[i]){
-                case 0: resultFile << "Cereal 2 \n"; break;
+                case 0: resultFile << "Cereal 1 \n"; break;
                 case 1: resultFile << "Cereal 2 \n"; break;
                 case 2: resultFile << "Cereal 3"; break;
                 case 3: resultFile << "Empty \n"; break;
