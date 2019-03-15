@@ -195,7 +195,7 @@ int main(int argc, char** argv) {
 	//Move Back to Starting Position and Output file
 	Navigation::moveToGoal(startX,startY,startPhi);
 #endif
-        ofstream resultFile;
+        std::ofstream resultFile;
         resultFile.open("Contest2_Results");
         for(int i;i<nodes-1;i++){
             resultFile <<"Box " << i << "->";
@@ -253,7 +253,7 @@ int main(int argc, char** argv) {
 2. Rotation Code
  // assuming we get a flag from imagepipeline that image is not clear. Robot will rotate +45 and -45 degrees
  
- /* while (scanComplete==0) {
+ while (scanComplete==0) {
  if (rotateflag == 0){ // rotate right
  angleIncrement +=5*3.14/180;
  Navigation::moveToGoal(xGoal,yGoal,phiGoal+angleIncrement);
@@ -276,5 +276,5 @@ int main(int argc, char** argv) {
  imagePipeline.getTemplateID(boxes);
  }
  */
- */
+ 
 
