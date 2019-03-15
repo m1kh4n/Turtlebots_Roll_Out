@@ -50,6 +50,7 @@ int ImagePipeline::getTemplateID(Boxes& boxes) {
     } else {
         /***YOUR CODE HERE***/
         // Use: boxes.templates
+	template_id = 3;
         Mat Raisin = boxes.templates[0];
         Mat Cinnamon = boxes.templates[1];
         Mat Rice = boxes.templates[2];
@@ -619,7 +620,8 @@ int ImagePipeline::getTemplateID(Boxes& boxes) {
         }
         else std::cout << "Homography matrix is bad, no Cinnamon Toast Crunch match." << std::endl;
         for(int i = 0; i < 4; i++){
-            std::cout << recogTemplates[i] << std::endl;
+            //std::cout << recogTemplates[i] << std::endl;
+	    if (recogTemplates[i] == 1) template_id = i;
         }
     }
     return template_id;

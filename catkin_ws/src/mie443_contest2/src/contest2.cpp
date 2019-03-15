@@ -19,8 +19,8 @@ std::vector <float> optimalPath; //Index 0 stores mininmum cost, rest of vector 
 float costMap[nodes][nodes];
 float deltaX, deltaY;
 int locationTag[nodes-1];
-const float scanRange = 45*3.14/180; //Scans 45 degrees in each direction
-const float scanIncrement = 5*3.14/180;
+const float scanRange = 30*3.14/180; //Scans 45 degrees in each direction
+const float scanIncrement = 10*3.14/180;
 
 //Helper Functions
 std::vector <float> find_minPath(int unvisited[],int currentNode){
@@ -168,33 +168,39 @@ int main(int argc, char** argv) {
 #ifdef MOVEMENT
 	int object;
 	for(int i=1;i<optimalPath.size()-1;i++){
-        //Calculate where to navigate to
+        	//Calculate where to navigate to
 		object =(int) optimalPath[i];
 		phiGoal = boxes.coords[object][2]-3.14;
 		xGoal = boxes.coords[object][0]-offsetFactor*cos(phiGoal);
 		yGoal = boxes.coords[object][1]-offsetFactor*sin(phiGoal);
 
-        //Navigate to Oject and Scan Images
-        int scanData[4]={0};
-        int scanData_index=0;
-        int currentTag;
-        for (float phiOffset=-scanRange;phiOffset<scanRange;phiOffset+=scanIncrement){
-            Navigation::moveToGoal(xGoal,yGoal,phiGoal+phiOffset);
-            currentTag=imagePipeline.getTemplateID(boxes);
-            ROS_INFO("Scan %d: Tag = %d",scanData_index,currentTag)
-            scanData_index++;
-            scanData[currenTag]++;
-        }
+        	//Navigate to Oject and Scan Images
+        	int scanData[4]={0};
+        	int scanData_index=0;
+        	int currentTag;
+        	for (float phiOffset=-scanRange;phiOffset<scanRange;phiOffset+=scanIncrement){
+            		Navigation::moveToGoal(xGoal,yGoal,phiGoal+phiOffset);
+            		currentTag=imagePipeline.getTemplateID(boxes);
+            		ROS_INFO("Scan %d: Tag = %d",scanData_index,currentTag)
+            		scanData_index++;
+            		scanData[currenTag]++;
+        	}
         
-        //Store most likely Tag
-        locationTag[object]=std::max_element(scanData,scanData+4);
-        ROS_INFO("At box %d, Tag Determined to be %d",object,locationTag[object]);
-        ros::Duration(2).sleep();
+        	//Store most likely Tag
+        	locationTag[object]=std::max_element(scanData,scanData+4);
+        	ROS_INFO("At box %d, Tag Determined to be %d",object,locationTag[object]);
+       	 	ros::Duration(2).sleep();
 	}
 
 	//Move Back to Starting Position and Output file
 	Navigation::moveToGoal(startX,startY,startPhi);
+
 #endif
+#ifndef MOVEMENT
+	int currentTag = imagePipeline.getTemplateID(boxes);
+	ROS_INFO("Scanned Output: %d",currentTag);	
+#endif
+#ifdef MOVEMENT
         std::ofstream resultFile;
         resultFile.open("Contest2_Results");
         for(int i;i<nodes-1;i++){
@@ -207,8 +213,8 @@ int main(int argc, char** argv) {
             }
         }
         resultFile.close();
-        
 	ros::Duration(100).sleep();
+#endif
     }
     return 0;
 }
