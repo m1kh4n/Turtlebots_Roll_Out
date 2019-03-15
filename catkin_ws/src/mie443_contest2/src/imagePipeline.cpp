@@ -72,8 +72,8 @@ int ImagePipeline::getTemplateID(Boxes& boxes) {
  	extractor->compute(boxes.templates[0], keypointsRaisin, descriptorRaisin);
  	extractor->compute(boxes.templates[1], keypointsRice, descriptorRice);
  	extractor->compute(boxes.templates[2], keypointsCinnamon, descriptorCinnamon);
-	cv::imshow("view", Raisin);
-        cv::waitKey(10);
+	//cv::imshow("view", Raisin);
+        //cv::waitKey(10);
 
 	//-- Identifying which image it best matches
         int notEnoughRaisinMatches = 0;
@@ -435,17 +435,12 @@ int ImagePipeline::getTemplateID(Boxes& boxes) {
                 std::cout << "Homography matrix is good, probable Raisin Bran match" << std::endl;
         	matcher.match(descriptorRaisin, descriptorTestImage, matches);
 		max_dist = 0; min_dist = 100;
-		//-- Quick calculation of max and min distances between keypoints
 	        for( int i = 0; i < descriptorRaisin.rows; i++ ){
         	        double dist = matches[i].distance;
         	        if( dist < min_dist ) min_dist = dist;
         	        if( dist > max_dist ) max_dist = dist;
 	        }
 
-		//-- Draw only "good" matches (i.e. whose distance is less than 2*min_dist,
-		//-- or a small arbitary value ( 0.02 ) in the event that min_dist is very
-		//-- small
-		//-- PS.- radiusMatch can also be used here.
 	        good_matches.clear();
 	
 	        for(int i = 0; i < descriptorRaisin.rows; i++){
@@ -454,37 +449,30 @@ int ImagePipeline::getTemplateID(Boxes& boxes) {
 	                }
 	        }
 	
-		//-- Draw only "good" matches
         	drawMatches(boxes.templates[0], keypointsRaisin, img, keypointsTestImage,
         	       good_matches, img_matches, Scalar::all(-1), Scalar::all(-1),
         	       std::vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
 
        		if(good_matches.size() < 10) notEnoughRaisinMatches = 1;
 	
-	  
-		//-- Localise the Object
 	        for(int i = 0; i<good_matches.size(); i++){
 	                //-- Get the keypoints from the good matches
 	                obj.push_back(keypointsRaisin[good_matches[i].queryIdx].pt);
         	        scene.push_back(keypointsTestImage[good_matches[i].trainIdx].pt);
         	}
 
-		//-- Get homography matrix
         	homographyMatrix = findHomography(obj,scene,RANSAC);
 	
-		//-- Get the corners from the image_1 ( the object to be "detected" )
 	        obj_corners[0] = cvPoint(0,0); obj_corners[1] = cvPoint(Raisin.cols, 0);
 	        obj_corners[2] = cvPoint(Raisin.cols, Raisin.rows); obj_corners[3] = cvPoint(0, Raisin.rows);
 
 	        perspectiveTransform( obj_corners, scene_corners, homographyMatrix);
-	
-		//-- Draw lines between the corners (the mapped object in the scene - image_2 )
+
 	        line( img_matches, scene_corners[0] + Point2f( Raisin.cols, 0), scene_corners[1] + Point2f( Raisin.cols, 0), Scalar(0, 255, 0), 4 );
 	        line( img_matches, scene_corners[1] + Point2f( Raisin.cols, 0), scene_corners[2] + Point2f( Raisin.cols, 0), Scalar( 0, 255, 0), 4 );
 	        line( img_matches, scene_corners[2] + Point2f( Raisin.cols, 0), scene_corners[3] + Point2f( Raisin.cols, 0), Scalar( 0, 255, 0), 4 );
 	        line( img_matches, scene_corners[3] + Point2f( Raisin.cols, 0), scene_corners[0] + Point2f( Raisin.cols, 0), Scalar( 0, 255, 0), 4 );
 	
-		//-- Show detected matches
 	        imshow( "Good Matches & Homography Calculation", img_matches );       
 	}
         else std::cout << "Homography matrix is bad, no Raisen Bran match." << std::endl;
@@ -494,7 +482,7 @@ int ImagePipeline::getTemplateID(Boxes& boxes) {
                 matcher.match(descriptorRice, descriptorTestImage, matches);
 
 	        max_dist = 0; min_dist = 100;
-		//-- Quick calculation of max and min distances between keypoints
+
 	        for( int i = 0; i < descriptorRice.rows; i++ ){
 	                double dist = matches[i].distance;
 	                if( dist < min_dist ) min_dist = dist;
@@ -504,10 +492,6 @@ int ImagePipeline::getTemplateID(Boxes& boxes) {
 	        printf("-- Max dist : %f \n", max_dist );
 	        printf("-- Min dist : %f \n", min_dist );
 	
-		//-- Draw only "good" matches (i.e. whose distance is less than 2*min_dist,
-		//-- or a small arbitary value ( 0.02 ) in the event that min_dist is very
-		//-- small
-		//-- PS.- radiusMatch can also be used here.
 		good_matches.clear();
 	
 	        for(int i = 0; i < descriptorRice.rows; i++){
@@ -515,16 +499,11 @@ int ImagePipeline::getTemplateID(Boxes& boxes) {
 	                        good_matches.push_back( matches[i]);
 	                }
 	        }
-	
-		//-- Draw only "good" matches
 		       drawMatches(boxes.templates[0], keypointsRaisin, img, keypointsTestImage,
         	       good_matches, img_matches, Scalar::all(-1), Scalar::all(-1),
 	               std::vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
 	
 	        if(good_matches.size() < 10) notEnoughRiceMatches = 1;
-	
-	  
-		//-- Localise the Object
 	
 	        for(int i = 0; i<good_matches.size(); i++){
 	                //-- Get the keypoints from the good matches
@@ -532,22 +511,18 @@ int ImagePipeline::getTemplateID(Boxes& boxes) {
 	                scene.push_back(keypointsTestImage[good_matches[i].trainIdx].pt);
 	        }
 	
-		//-- Get homography matrix
 	        homographyMatrix = findHomography(obj,scene,RANSAC);
-	
-		//-- Get the corners from the image_1 ( the object to be "detected" )
+
 	        obj_corners[0] = cvPoint(0,0); obj_corners[1] = cvPoint(Rice.cols, 0);
 	        obj_corners[2] = cvPoint(Rice.cols, Rice.rows); obj_corners[3] = cvPoint(0, Rice.rows);
 	
 	        perspectiveTransform( obj_corners, scene_corners, homographyMatrix);
 	
-		//-- Draw lines between the corners (the mapped object in the scene - image_2 )
 	        line( img_matches, scene_corners[0] + Point2f( Rice.cols, 0), scene_corners[1] + Point2f( Rice.cols, 0), Scalar(0, 255, 0), 4 );
 	        line( img_matches, scene_corners[1] + Point2f( Rice.cols, 0), scene_corners[2] + Point2f( Rice.cols, 0), Scalar( 0, 255, 0), 4 );
 	        line( img_matches, scene_corners[2] + Point2f( Rice.cols, 0), scene_corners[3] + Point2f( Rice.cols, 0), Scalar( 0, 255, 0), 4 );
 	        line( img_matches, scene_corners[3] + Point2f( Rice.cols, 0), scene_corners[0] + Point2f( Rice.cols, 0), Scalar( 0, 255, 0), 4 );
 	
-		//-- Show detected matches
 	        imshow( "Good Matches & Homography Calculation", img_matches );
 	}
         else std::cout << "Homography matrix is bad, no Rice Krispies match." << std::endl;
@@ -557,7 +532,6 @@ int ImagePipeline::getTemplateID(Boxes& boxes) {
         	matcher.match(descriptorCinnamon, descriptorTestImage, matches);
 
         	max_dist = 0; min_dist = 100;
-		//-- Quick calculation of max and min distances between keypoints
         	for( int i = 0; i < descriptorCinnamon.rows; i++ ){
                 	double dist = matches[i].distance;
                		if( dist < min_dist ) min_dist = dist;
@@ -567,10 +541,6 @@ int ImagePipeline::getTemplateID(Boxes& boxes) {
 	        printf("-- Max dist : %f \n", max_dist );
 	        printf("-- Min dist : %f \n", min_dist );
 
-		//-- Draw only "good" matches (i.e. whose distance is less than 2*min_dist,
-		//-- or a small arbitary value ( 0.02 ) in the event that min_dist is very
-		//-- small
-		//-- PS.- radiusMatch can also be used here.
 		good_matches.clear();
 	
 	        for(int i = 0; i < descriptorCinnamon.rows; i++){
@@ -579,38 +549,30 @@ int ImagePipeline::getTemplateID(Boxes& boxes) {
 	                }
 	        }
 	
-		//-- Draw only "good" matches
 	        drawMatches(boxes.templates[0], keypointsCinnamon, img, keypointsTestImage,
 	               good_matches, img_matches, Scalar::all(-1), Scalar::all(-1),
 	               std::vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
 	
 	        if(good_matches.size() < 10) notEnoughCinnamonMatches = 1;
-
-  
-		//-- Localise the Object
 	
 	       	for(int i = 0; i<good_matches.size(); i++){
 	                //-- Get the keypoints from the good matches
 	                obj.push_back(keypointsCinnamon[good_matches[i].queryIdx].pt);
 	                scene.push_back(keypointsTestImage[good_matches[i].trainIdx].pt);
 	        }
-	
-		//-- Get homography matrix
+
 	        homographyMatrix = findHomography(obj,scene,RANSAC);
-	
-			//-- Get the corners from the image_1 ( the object to be "detected" )
+
 	        obj_corners[0] = cvPoint(0,0); obj_corners[1] = cvPoint(Cinnamon.cols, 0);
 	        obj_corners[2] = cvPoint(Cinnamon.cols, Cinnamon.rows); obj_corners[3] = cvPoint(0, Cinnamon.rows);
 	
 	        perspectiveTransform( obj_corners, scene_corners, homographyMatrix);
 	
-		//-- Draw lines between the corners (the mapped object in the scene - image_2 )
 	        line( img_matches, scene_corners[0] + Point2f( Cinnamon.cols, 0), scene_corners[1] + Point2f( Cinnamon.cols, 0), Scalar(0, 255, 0), 4 );
 	        line( img_matches, scene_corners[1] + Point2f( Cinnamon.cols, 0), scene_corners[2] + Point2f( Cinnamon.cols, 0), Scalar( 0, 255, 0), 4 );
 	        line( img_matches, scene_corners[2] + Point2f( Cinnamon.cols, 0), scene_corners[3] + Point2f( Cinnamon.cols, 0), Scalar( 0, 255, 0), 4 );
 	        line( img_matches, scene_corners[3] + Point2f( Cinnamon.cols, 0), scene_corners[0] + Point2f( Cinnamon.cols, 0), Scalar( 0, 255, 0), 4 );
-	
-		//-- Show detected matches
+
 	        imshow( "Good Matches & Homography Calculation", img_matches );
 	
 	        for( int i = 0; i < (int)good_matches.size(); i++ ){
