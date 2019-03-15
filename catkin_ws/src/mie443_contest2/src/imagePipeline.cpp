@@ -624,5 +624,6 @@ int ImagePipeline::getTemplateID(Boxes& boxes) {
 	    if (recogTemplates[i] == 1) template_id = i;
         }
     }
+    waitKey(0);
     return template_id;
 }
