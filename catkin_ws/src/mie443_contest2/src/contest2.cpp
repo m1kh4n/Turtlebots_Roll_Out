@@ -1,5 +1,5 @@
-//#define CALCULATE_SHORTEST 1
-//#define MOVEMENT 1
+#define CALCULATE_SHORTEST 1
+#define MOVEMENT 1
 
 #include <boxes.h>
 #include <navigation.h>
@@ -19,8 +19,8 @@ std::vector <float> optimalPath; //Index 0 stores mininmum cost, rest of vector 
 float costMap[nodes][nodes];
 float deltaX, deltaY;
 int locationTag[nodes-1];
-const float scanRange = 30*3.14/180; //Scans 45 degrees in each direction
-const float scanIncrement = 10*3.14/180;
+const float scanRange = 10*3.14/180; //Scans 45 degrees in each direction
+const float scanIncrement = 5*3.14/180;
 
 //Helper Functions
 std::vector <float> find_minPath(int unvisited[],int currentNode){
@@ -154,7 +154,8 @@ int main(int argc, char** argv) {
 
     //Part 2 - Navigate and capture image
     float xGoal,yGoal,phiGoal;
-    float offsetFactor = 0.4;
+    float offsetFactor = 0.7;
+    
     //bool rotateflag = 0
     //int angleIncrement = 1; // 1 degree angle increment (in rad)
     //int targetRotate = 30; // angle to which robot rotates to when in front of image to adjust position.
@@ -166,28 +167,47 @@ int main(int argc, char** argv) {
         - Use: robotPose.x, robotPose.y, robotPose.phi
 	*/
 #ifdef MOVEMENT
+	float objectFloat;
 	int object;
-	for(int i=1;i<optimalPath.size()-1;i++){
+	ROS_INFO("Starting Navigation Sequence to locate tags");
+	for(int i=2;i<=nodes;i++){
         	//Calculate where to navigate to
-		object =(int) optimalPath[i];
+		objectFloat = optimalPath[i];
+		object = static_cast<int>(objectFloat);
+		std::cout << "PhiGoal: " << boxes.coords[object][2] << std::endl;
 		phiGoal = boxes.coords[object][2]-3.14;
 		xGoal = boxes.coords[object][0]-offsetFactor*cos(phiGoal);
 		yGoal = boxes.coords[object][1]-offsetFactor*sin(phiGoal);
-
+		ROS_INFO("Moving to box:%d",object);
+	
         	//Navigate to Oject and Scan Images
         	int scanData[4]={0};
         	int scanData_index=0;
         	int currentTag;
         	for (float phiOffset=-scanRange;phiOffset<scanRange;phiOffset+=scanIncrement){
             		Navigation::moveToGoal(xGoal,yGoal,phiGoal+phiOffset);
-            		currentTag=imagePipeline.getTemplateID(boxes);
-            		ROS_INFO("Scan %d: Tag = %d",scanData_index,currentTag)
+            		ros::spinOnce();
+			currentTag=imagePipeline.getTemplateID(boxes);
+            		ROS_INFO("Scan %d: Tag = %d",scanData_index,currentTag);
             		scanData_index++;
-            		scanData[currenTag]++;
+			if(currentTag==-1)
+				ROS_INFO("IMAGEPIPELINE ERROR");
+			else if (currentTag==3)
+            			scanData[currentTag]++;
+			else
+				scanData[currentTag]+=2;
+
+			if(scanData[currentTag]>4)
+				break;		
         	}
         
         	//Store most likely Tag
-        	locationTag[object]=std::max_element(scanData,scanData+4);
+		int predictedTag=0;
+		for (int j=1;j<4;j++){
+			if(scanData[j]>scanData[predictedTag])
+				predictedTag=j;
+		}
+        	locationTag[object]=predictedTag;
         	ROS_INFO("At box %d, Tag Determined to be %d",object,locationTag[object]);
        	 	ros::Duration(2).sleep();
 	}
@@ -197,8 +217,28 @@ int main(int argc, char** argv) {
 
 #endif
 #ifndef MOVEMENT
-	int currentTag = imagePipeline.getTemplateID(boxes);
-	ROS_INFO("Scanned Output: %d",currentTag);	
+	int scanData[4]={0};
+        int scanData_index=0;
+        int currentTag;
+        for (int i = 0;i<(int)(2*scanRange/scanIncrement+1);i++){
+            	ros::spinOnce();
+		currentTag=imagePipeline.getTemplateID(boxes);
+            	ROS_INFO("Scan %d: Tag = %d",scanData_index,currentTag);
+            	scanData_index++;
+		if(currentTag!=-1)
+            		scanData[currentTag]++;
+		else
+			ROS_INFO("IMAGEPIPELINE ERROR");
+        	}
+        
+        //Store most likely Tag
+	int predictedTag=0;
+	for (int j=1;j<4;j++){
+		if(scanData[j]>scanData[predictedTag])
+			predictedTag=j;
+		}
+        locationTag[0]=predictedTag;
+        ROS_INFO("Tag Determined to be %d",locationTag[0]);	
 #endif
 #ifdef MOVEMENT
         std::ofstream resultFile;
@@ -206,10 +246,10 @@ int main(int argc, char** argv) {
         for(int i;i<nodes-1;i++){
             resultFile <<"Box " << i << "->";
             switch(locationTag[i]){
-                case 0: resultFile << "Cereal 1 \n"; break;
-                case 1: resultFile << "Cereal 2 \n"; break;
-                case 2: resultFile << "Cereal 3"; break;
-                case 3: resultFile << "Empty \n"; break;
+                case 0: resultFile << "Raisin Bran\n"; break;
+                case 1: resultFile << "Rice Krispie\n"; break;
+                case 2: resultFile << "Cinnamon Toast Crunch\n"; break;
+                case 3: resultFile << "Empty\n"; break;
             }
         }
         resultFile.close();

@@ -12,6 +12,7 @@
 #include "opencv2/core/types_c.h"
 #include "opencv2/imgproc.hpp"
 
+#define PRINT_IMAGE
 #define IMAGE_TYPE sensor_msgs::image_encodings::BGR8
 #define IMAGE_TOPIC "camera/rgb/image_raw" // kinect:"camera/rgb/image_raw" webcam:"camera/image"
 
@@ -624,6 +625,6 @@ int ImagePipeline::getTemplateID(Boxes& boxes) {
 	    if (recogTemplates[i] == 1) template_id = i;
         }
     }
-    waitKey(0);
+    //waitKey(0);
     return template_id;
 }
