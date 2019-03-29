@@ -212,6 +212,20 @@ int main(int argc, char** argv) {
        	 	ros::Duration(2).sleep();
 	}
 
+	//Print out File
+	std::ofstream resultFile;
+        resultFile.open("Contest2_Results");
+        for(int i;i<nodes-1;i++){
+            resultFile <<"Box " << i << "->";
+            switch(locationTag[i]){
+                case 0: resultFile << "Raisin Bran\n"; break;
+                case 1: resultFile << "Rice Krispie\n"; break;
+                case 2: resultFile << "Cinnamon Toast Crunch\n"; break;
+                case 3: resultFile << "Empty\n"; break;
+            }
+        }
+        resultFile.close();
+
 	//Move Back to Starting Position and Output file
 	Navigation::moveToGoal(startX,startY,startPhi);
 
@@ -241,18 +255,7 @@ int main(int argc, char** argv) {
         ROS_INFO("Tag Determined to be %d",locationTag[0]);	
 #endif
 #ifdef MOVEMENT
-        std::ofstream resultFile;
-        resultFile.open("Contest2_Results");
-        for(int i;i<nodes-1;i++){
-            resultFile <<"Box " << i << "->";
-            switch(locationTag[i]){
-                case 0: resultFile << "Raisin Bran\n"; break;
-                case 1: resultFile << "Rice Krispie\n"; break;
-                case 2: resultFile << "Cinnamon Toast Crunch\n"; break;
-                case 3: resultFile << "Empty\n"; break;
-            }
-        }
-        resultFile.close();
+        
 	ros::Duration(100).sleep();
 #endif
     }

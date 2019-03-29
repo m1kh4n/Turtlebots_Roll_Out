@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/albertliu/Turtlebots_Roll_Out/catkin_ws/src
+CMAKE_SOURCE_DIR = /home/turtlebot/catkin_ws/src
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/albertliu/Turtlebots_Roll_Out/catkin_ws/build
+CMAKE_BINARY_DIR = /home/turtlebot/catkin_ws/build
 
 # Include any dependencies generated for this target.
 include mie443_contest1/CMakeFiles/contest1.dir/depend.make
@@ -58,17 +58,17 @@ include mie443_contest1/CMakeFiles/contest1.dir/progress.make
 include mie443_contest1/CMakeFiles/contest1.dir/flags.make
 
 mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: mie443_contest1/CMakeFiles/contest1.dir/flags.make
-mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: /home/albertliu/Turtlebots_Roll_Out/catkin_ws/src/mie443_contest1/src/contest1.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/albertliu/Turtlebots_Roll_Out/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o"
-	cd /home/albertliu/Turtlebots_Roll_Out/catkin_ws/build/mie443_contest1 && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/contest1.dir/src/contest1.cpp.o -c /home/albertliu/Turtlebots_Roll_Out/catkin_ws/src/mie443_contest1/src/contest1.cpp
+mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o: /home/turtlebot/catkin_ws/src/mie443_contest1/src/contest1.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/turtlebot/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o"
+	cd /home/turtlebot/catkin_ws/build/mie443_contest1 && /usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/contest1.dir/src/contest1.cpp.o -c /home/turtlebot/catkin_ws/src/mie443_contest1/src/contest1.cpp
 
 mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/contest1.dir/src/contest1.cpp.i"
-	cd /home/albertliu/Turtlebots_Roll_Out/catkin_ws/build/mie443_contest1 && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/albertliu/Turtlebots_Roll_Out/catkin_ws/src/mie443_contest1/src/contest1.cpp > CMakeFiles/contest1.dir/src/contest1.cpp.i
+	cd /home/turtlebot/catkin_ws/build/mie443_contest1 && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/turtlebot/catkin_ws/src/mie443_contest1/src/contest1.cpp > CMakeFiles/contest1.dir/src/contest1.cpp.i
 
 mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/contest1.dir/src/contest1.cpp.s"
-	cd /home/albertliu/Turtlebots_Roll_Out/catkin_ws/build/mie443_contest1 && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/albertliu/Turtlebots_Roll_Out/catkin_ws/src/mie443_contest1/src/contest1.cpp -o CMakeFiles/contest1.dir/src/contest1.cpp.s
+	cd /home/turtlebot/catkin_ws/build/mie443_contest1 && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/turtlebot/catkin_ws/src/mie443_contest1/src/contest1.cpp -o CMakeFiles/contest1.dir/src/contest1.cpp.s
 
 mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o.requires:
 
@@ -88,48 +88,48 @@ contest1_OBJECTS = \
 # External object files for target contest1
 contest1_EXTERNAL_OBJECTS =
 
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: mie443_contest1/CMakeFiles/contest1.dir/build.make
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: /opt/ros/kinetic/lib/libcv_bridge.so
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: /opt/ros/kinetic/lib/x86_64-linux-gnu/libopencv_core3.so.3.3.1
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: /opt/ros/kinetic/lib/x86_64-linux-gnu/libopencv_imgproc3.so.3.3.1
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: /opt/ros/kinetic/lib/x86_64-linux-gnu/libopencv_imgcodecs3.so.3.3.1
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: /opt/ros/kinetic/lib/libimage_transport.so
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: /opt/ros/kinetic/lib/libmessage_filters.so
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: /usr/lib/x86_64-linux-gnu/libtinyxml2.so
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: /opt/ros/kinetic/lib/libclass_loader.so
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: /usr/lib/libPocoFoundation.so
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: /usr/lib/x86_64-linux-gnu/libdl.so
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: /opt/ros/kinetic/lib/libroscpp.so
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: /usr/lib/x86_64-linux-gnu/libboost_signals.so
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: /opt/ros/kinetic/lib/librosconsole.so
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: /opt/ros/kinetic/lib/librosconsole_log4cxx.so
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: /opt/ros/kinetic/lib/librosconsole_backend_interface.so
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: /usr/lib/x86_64-linux-gnu/liblog4cxx.so
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: /usr/lib/x86_64-linux-gnu/libboost_regex.so
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: /opt/ros/kinetic/lib/libxmlrpcpp.so
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: /opt/ros/kinetic/lib/libroslib.so
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: /opt/ros/kinetic/lib/librospack.so
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: /usr/lib/x86_64-linux-gnu/libpython2.7.so
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: /usr/lib/x86_64-linux-gnu/libboost_filesystem.so
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: /usr/lib/x86_64-linux-gnu/libboost_program_options.so
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: /usr/lib/x86_64-linux-gnu/libtinyxml.so
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: /opt/ros/kinetic/lib/libroscpp_serialization.so
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: /opt/ros/kinetic/lib/librostime.so
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: /opt/ros/kinetic/lib/libcpp_common.so
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: /usr/lib/x86_64-linux-gnu/libboost_system.so
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: /usr/lib/x86_64-linux-gnu/libboost_thread.so
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: /usr/lib/x86_64-linux-gnu/libboost_chrono.so
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: /usr/lib/x86_64-linux-gnu/libboost_date_time.so
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: /usr/lib/x86_64-linux-gnu/libboost_atomic.so
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: /usr/lib/x86_64-linux-gnu/libpthread.so
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: /usr/lib/x86_64-linux-gnu/libconsole_bridge.so
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1: mie443_contest1/CMakeFiles/contest1.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/albertliu/Turtlebots_Roll_Out/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable /home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1"
-	cd /home/albertliu/Turtlebots_Roll_Out/catkin_ws/build/mie443_contest1 && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/contest1.dir/link.txt --verbose=$(VERBOSE)
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: mie443_contest1/CMakeFiles/contest1.dir/src/contest1.cpp.o
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: mie443_contest1/CMakeFiles/contest1.dir/build.make
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: /opt/ros/kinetic/lib/libcv_bridge.so
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: /opt/ros/kinetic/lib/x86_64-linux-gnu/libopencv_core3.so.3.3.1
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: /opt/ros/kinetic/lib/x86_64-linux-gnu/libopencv_imgproc3.so.3.3.1
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: /opt/ros/kinetic/lib/x86_64-linux-gnu/libopencv_imgcodecs3.so.3.3.1
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: /opt/ros/kinetic/lib/libimage_transport.so
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: /opt/ros/kinetic/lib/libmessage_filters.so
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: /usr/lib/x86_64-linux-gnu/libtinyxml2.so
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: /opt/ros/kinetic/lib/libclass_loader.so
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: /usr/lib/libPocoFoundation.so
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: /usr/lib/x86_64-linux-gnu/libdl.so
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: /opt/ros/kinetic/lib/libroscpp.so
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: /usr/lib/x86_64-linux-gnu/libboost_signals.so
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: /opt/ros/kinetic/lib/librosconsole.so
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: /opt/ros/kinetic/lib/librosconsole_log4cxx.so
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: /opt/ros/kinetic/lib/librosconsole_backend_interface.so
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: /usr/lib/x86_64-linux-gnu/liblog4cxx.so
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: /usr/lib/x86_64-linux-gnu/libboost_regex.so
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: /opt/ros/kinetic/lib/libxmlrpcpp.so
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: /opt/ros/kinetic/lib/libroslib.so
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: /opt/ros/kinetic/lib/librospack.so
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: /usr/lib/x86_64-linux-gnu/libpython2.7.so
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: /usr/lib/x86_64-linux-gnu/libboost_filesystem.so
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: /usr/lib/x86_64-linux-gnu/libboost_program_options.so
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: /usr/lib/x86_64-linux-gnu/libtinyxml.so
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: /opt/ros/kinetic/lib/libroscpp_serialization.so
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: /opt/ros/kinetic/lib/librostime.so
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: /opt/ros/kinetic/lib/libcpp_common.so
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: /usr/lib/x86_64-linux-gnu/libboost_system.so
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: /usr/lib/x86_64-linux-gnu/libboost_thread.so
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: /usr/lib/x86_64-linux-gnu/libboost_chrono.so
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: /usr/lib/x86_64-linux-gnu/libboost_date_time.so
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: /usr/lib/x86_64-linux-gnu/libboost_atomic.so
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: /usr/lib/x86_64-linux-gnu/libpthread.so
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: /usr/lib/x86_64-linux-gnu/libconsole_bridge.so
+/home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1: mie443_contest1/CMakeFiles/contest1.dir/link.txt
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/turtlebot/catkin_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable /home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1"
+	cd /home/turtlebot/catkin_ws/build/mie443_contest1 && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/contest1.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
-mie443_contest1/CMakeFiles/contest1.dir/build: /home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/mie443_contest1/contest1
+mie443_contest1/CMakeFiles/contest1.dir/build: /home/turtlebot/catkin_ws/devel/lib/mie443_contest1/contest1
 
 .PHONY : mie443_contest1/CMakeFiles/contest1.dir/build
 
@@ -138,10 +138,10 @@ mie443_contest1/CMakeFiles/contest1.dir/requires: mie443_contest1/CMakeFiles/con
 .PHONY : mie443_contest1/CMakeFiles/contest1.dir/requires
 
 mie443_contest1/CMakeFiles/contest1.dir/clean:
-	cd /home/albertliu/Turtlebots_Roll_Out/catkin_ws/build/mie443_contest1 && $(CMAKE_COMMAND) -P CMakeFiles/contest1.dir/cmake_clean.cmake
+	cd /home/turtlebot/catkin_ws/build/mie443_contest1 && $(CMAKE_COMMAND) -P CMakeFiles/contest1.dir/cmake_clean.cmake
 .PHONY : mie443_contest1/CMakeFiles/contest1.dir/clean
 
 mie443_contest1/CMakeFiles/contest1.dir/depend:
-	cd /home/albertliu/Turtlebots_Roll_Out/catkin_ws/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/albertliu/Turtlebots_Roll_Out/catkin_ws/src /home/albertliu/Turtlebots_Roll_Out/catkin_ws/src/mie443_contest1 /home/albertliu/Turtlebots_Roll_Out/catkin_ws/build /home/albertliu/Turtlebots_Roll_Out/catkin_ws/build/mie443_contest1 /home/albertliu/Turtlebots_Roll_Out/catkin_ws/build/mie443_contest1/CMakeFiles/contest1.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/turtlebot/catkin_ws/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/turtlebot/catkin_ws/src /home/turtlebot/catkin_ws/src/mie443_contest1 /home/turtlebot/catkin_ws/build /home/turtlebot/catkin_ws/build/mie443_contest1 /home/turtlebot/catkin_ws/build/mie443_contest1/CMakeFiles/contest1.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : mie443_contest1/CMakeFiles/contest1.dir/depend
 

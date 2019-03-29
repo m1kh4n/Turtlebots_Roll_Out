@@ -1,2 +1,2 @@
-mie443_contest1:mie443_contest2
--DCATKIN_DEVEL_PREFIX=/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel -DCMAKE_INSTALL_PREFIX=/home/albertliu/Turtlebots_Roll_Out/catkin_ws/install -G Unix Makefiles
+mie443_contest1:mie443_contest2:mie443_contest3:turtlebot_follower
+-DCATKIN_DEVEL_PREFIX=/home/turtlebot/catkin_ws/devel -DCMAKE_INSTALL_PREFIX=/home/turtlebot/catkin_ws/install -G Unix Makefiles

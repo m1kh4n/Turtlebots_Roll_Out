@@ -6,15 +6,15 @@
 
 #IncludeRegexTransform: 
 
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/src/mie443_contest1/include/eStop.h
+/home/turtlebot/catkin_ws/src/mie443_contest1/include/eStop.h
 sensor_msgs/Joy.h
 -
 
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/src/mie443_contest1/src/contest1.cpp
+/home/turtlebot/catkin_ws/src/mie443_contest1/src/contest1.cpp
 ros/console.h
 -
 ros/ros.h
-/home/albertliu/Turtlebots_Roll_Out/catkin_ws/src/mie443_contest1/src/ros/ros.h
+/home/turtlebot/catkin_ws/src/mie443_contest1/src/ros/ros.h
 geometry_msgs/Twist.h
 -
 kobuki_msgs/BumperEvent.h

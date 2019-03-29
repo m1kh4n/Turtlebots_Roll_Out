@@ -1,24 +1,24 @@
 Determining if the pthread_create exist failed with the following output:
-Change Dir: /home/albertliu/Turtlebots_Roll_Out/catkin_ws/build/CMakeFiles/CMakeTmp
+Change Dir: /home/turtlebot/catkin_ws/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_e1876/fast"
-/usr/bin/make -f CMakeFiles/cmTC_e1876.dir/build.make CMakeFiles/cmTC_e1876.dir/build
-make[1]: Entering directory '/home/albertliu/Turtlebots_Roll_Out/catkin_ws/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_e1876.dir/CheckSymbolExists.c.o
-/usr/bin/cc     -o CMakeFiles/cmTC_e1876.dir/CheckSymbolExists.c.o   -c /home/albertliu/Turtlebots_Roll_Out/catkin_ws/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
-Linking C executable cmTC_e1876
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e1876.dir/link.txt --verbose=1
-/usr/bin/cc       CMakeFiles/cmTC_e1876.dir/CheckSymbolExists.c.o  -o cmTC_e1876 -rdynamic 
-CMakeFiles/cmTC_e1876.dir/CheckSymbolExists.c.o: In function `main':
+Run Build Command:"/usr/bin/make" "cmTC_3adf5/fast"
+/usr/bin/make -f CMakeFiles/cmTC_3adf5.dir/build.make CMakeFiles/cmTC_3adf5.dir/build
+make[1]: Entering directory '/home/turtlebot/catkin_ws/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_3adf5.dir/CheckSymbolExists.c.o
+/usr/bin/cc     -o CMakeFiles/cmTC_3adf5.dir/CheckSymbolExists.c.o   -c /home/turtlebot/catkin_ws/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_3adf5
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_3adf5.dir/link.txt --verbose=1
+/usr/bin/cc       CMakeFiles/cmTC_3adf5.dir/CheckSymbolExists.c.o  -o cmTC_3adf5 -rdynamic 
+CMakeFiles/cmTC_3adf5.dir/CheckSymbolExists.c.o: In function `main':
 CheckSymbolExists.c:(.text+0x16): undefined reference to `pthread_create'
 collect2: error: ld returned 1 exit status
-CMakeFiles/cmTC_e1876.dir/build.make:97: recipe for target 'cmTC_e1876' failed
-make[1]: *** [cmTC_e1876] Error 1
-make[1]: Leaving directory '/home/albertliu/Turtlebots_Roll_Out/catkin_ws/build/CMakeFiles/CMakeTmp'
-Makefile:126: recipe for target 'cmTC_e1876/fast' failed
-make: *** [cmTC_e1876/fast] Error 2
+CMakeFiles/cmTC_3adf5.dir/build.make:97: recipe for target 'cmTC_3adf5' failed
+make[1]: *** [cmTC_3adf5] Error 1
+make[1]: Leaving directory '/home/turtlebot/catkin_ws/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_3adf5/fast' failed
+make: *** [cmTC_3adf5/fast] Error 2
 
-File /home/albertliu/Turtlebots_Roll_Out/catkin_ws/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+File /home/turtlebot/catkin_ws/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
 /* */
 #include <pthread.h>
 
@@ -34,22 +34,22 @@ int main(int argc, char** argv)
 }
 
 Determining if the function pthread_create exists in the pthreads failed with the following output:
-Change Dir: /home/albertliu/Turtlebots_Roll_Out/catkin_ws/build/CMakeFiles/CMakeTmp
+Change Dir: /home/turtlebot/catkin_ws/build/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_16103/fast"
-/usr/bin/make -f CMakeFiles/cmTC_16103.dir/build.make CMakeFiles/cmTC_16103.dir/build
-make[1]: Entering directory '/home/albertliu/Turtlebots_Roll_Out/catkin_ws/build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_16103.dir/CheckFunctionExists.c.o
-/usr/bin/cc    -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_16103.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.5/Modules/CheckFunctionExists.c
-Linking C executable cmTC_16103
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_16103.dir/link.txt --verbose=1
-/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_16103.dir/CheckFunctionExists.c.o  -o cmTC_16103 -rdynamic -lpthreads 
+Run Build Command:"/usr/bin/make" "cmTC_65a3b/fast"
+/usr/bin/make -f CMakeFiles/cmTC_65a3b.dir/build.make CMakeFiles/cmTC_65a3b.dir/build
+make[1]: Entering directory '/home/turtlebot/catkin_ws/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_65a3b.dir/CheckFunctionExists.c.o
+/usr/bin/cc    -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_65a3b.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.5/Modules/CheckFunctionExists.c
+Linking C executable cmTC_65a3b
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_65a3b.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_65a3b.dir/CheckFunctionExists.c.o  -o cmTC_65a3b -rdynamic -lpthreads 
 /usr/bin/ld: cannot find -lpthreads
 collect2: error: ld returned 1 exit status
-CMakeFiles/cmTC_16103.dir/build.make:97: recipe for target 'cmTC_16103' failed
-make[1]: *** [cmTC_16103] Error 1
-make[1]: Leaving directory '/home/albertliu/Turtlebots_Roll_Out/catkin_ws/build/CMakeFiles/CMakeTmp'
-Makefile:126: recipe for target 'cmTC_16103/fast' failed
-make: *** [cmTC_16103/fast] Error 2
+CMakeFiles/cmTC_65a3b.dir/build.make:97: recipe for target 'cmTC_65a3b' failed
+make[1]: *** [cmTC_65a3b] Error 1
+make[1]: Leaving directory '/home/turtlebot/catkin_ws/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_65a3b/fast' failed
+make: *** [cmTC_65a3b/fast] Error 2
 
 

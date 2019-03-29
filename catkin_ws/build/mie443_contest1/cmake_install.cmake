@@ -1,8 +1,8 @@
-# Install script for directory: /home/albertliu/Turtlebots_Roll_Out/catkin_ws/src/mie443_contest1
+# Install script for directory: /home/turtlebot/catkin_ws/src/mie443_contest1
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/home/albertliu/Turtlebots_Roll_Out/catkin_ws/install")
+  set(CMAKE_INSTALL_PREFIX "/home/turtlebot/catkin_ws/install")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -33,37 +33,37 @@ if(NOT DEFINED CMAKE_INSTALL_SO_NO_EXE)
 endif()
 
 if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/mie443_contest1/cmake" TYPE FILE FILES "/home/albertliu/Turtlebots_Roll_Out/catkin_ws/build/mie443_contest1/catkin_generated/installspace/mie443_contest1-msg-paths.cmake")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/mie443_contest1/cmake" TYPE FILE FILES "/home/turtlebot/catkin_ws/build/mie443_contest1/catkin_generated/installspace/mie443_contest1-msg-paths.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/roseus/ros" TYPE DIRECTORY FILES "/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/share/roseus/ros/mie443_contest1")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/roseus/ros" TYPE DIRECTORY FILES "/home/turtlebot/catkin_ws/devel/share/roseus/ros/mie443_contest1")
 endif()
 
 if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
-  execute_process(COMMAND "/usr/bin/python" -m compileall "/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/python2.7/dist-packages/mie443_contest1")
+  execute_process(COMMAND "/usr/bin/python" -m compileall "/home/turtlebot/catkin_ws/devel/lib/python2.7/dist-packages/mie443_contest1")
 endif()
 
 if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/python2.7/dist-packages" TYPE DIRECTORY FILES "/home/albertliu/Turtlebots_Roll_Out/catkin_ws/devel/lib/python2.7/dist-packages/mie443_contest1")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/python2.7/dist-packages" TYPE DIRECTORY FILES "/home/turtlebot/catkin_ws/devel/lib/python2.7/dist-packages/mie443_contest1")
 endif()
 
 if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/albertliu/Turtlebots_Roll_Out/catkin_ws/build/mie443_contest1/catkin_generated/installspace/mie443_contest1.pc")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/turtlebot/catkin_ws/build/mie443_contest1/catkin_generated/installspace/mie443_contest1.pc")
 endif()
 
 if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/mie443_contest1/cmake" TYPE FILE FILES "/home/albertliu/Turtlebots_Roll_Out/catkin_ws/build/mie443_contest1/catkin_generated/installspace/mie443_contest1-msg-extras.cmake")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/mie443_contest1/cmake" TYPE FILE FILES "/home/turtlebot/catkin_ws/build/mie443_contest1/catkin_generated/installspace/mie443_contest1-msg-extras.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/mie443_contest1/cmake" TYPE FILE FILES
-    "/home/albertliu/Turtlebots_Roll_Out/catkin_ws/build/mie443_contest1/catkin_generated/installspace/mie443_contest1Config.cmake"
-    "/home/albertliu/Turtlebots_Roll_Out/catkin_ws/build/mie443_contest1/catkin_generated/installspace/mie443_contest1Config-version.cmake"
+    "/home/turtlebot/catkin_ws/build/mie443_contest1/catkin_generated/installspace/mie443_contest1Config.cmake"
+    "/home/turtlebot/catkin_ws/build/mie443_contest1/catkin_generated/installspace/mie443_contest1Config-version.cmake"
     )
 endif()
 
 if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/mie443_contest1" TYPE FILE FILES "/home/albertliu/Turtlebots_Roll_Out/catkin_ws/src/mie443_contest1/package.xml")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/mie443_contest1" TYPE FILE FILES "/home/turtlebot/catkin_ws/src/mie443_contest1/package.xml")
 endif()
 
