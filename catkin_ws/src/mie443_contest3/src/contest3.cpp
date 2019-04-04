@@ -25,23 +25,22 @@ void bumperCB(const kobuki_msgs::BumperEvent::ConstPtr msg){
     if(msg->bumper == 0)
 	    bumper.left = !bumper.left;
     else if(msg->bumper == 1)
-	    bumper.centre = !bumper.centre;
+	    bumper.center = !bumper.center;
     else if(msg->bumper ==2)
 	    bumper.right = !bumper.right;
 }
 struct Wheel{
 	bool right,left;
 };
-struct Wheel Wheel = {0,0};
+struct Wheel wheel = {0,0};
 
-<<<<<<< HEAD
 void wheeldropCB(const kobuki_msgs::WheelDropEvent::ConstPtr msg){
 	if (msg-> wheel == 1)
 		wheel.right = !wheel.right;
 	else if(msg->wheel == 0)
 		wheel.left = !wheel.left;
 }
-=======
+
 //Helper Functions
 bool isLost(){
 	if(vel.angular.z==0 && vel.linear.x && vel.linear.y ==0)
@@ -50,7 +49,6 @@ bool isLost(){
 		return false;
 }
 
->>>>>>> 49012f6b7956d5576904f8b23029185ebe4a37ec
 //-------------------------------------------------------------
 
 int main(int argc, char **argv)
@@ -99,7 +97,7 @@ int main(int argc, char **argv)
 			//
 			world_state = 2;
 		}
-		else if{
+		else if(0){
 			//
 			world_state = 3;
 		}
@@ -112,7 +110,7 @@ int main(int argc, char **argv)
 			while((clock()-t) < 2){
 				vel.angular.z=1;
 				vel_pub.publish(vel);
-				ros::spinOnce;
+				ros::spinOnce();
 				if(isLost()==false){
 					foundPerson = true;
 					break;
@@ -125,7 +123,7 @@ int main(int argc, char **argv)
 				while((clock()-t) < 4){
 					vel.angular.z=-1;
 					vel.pub.publish(vel);
-					ros::spinOnce;
+					ros::spinOnce();
 					if(isLost()==true){
 						foundPerson = true;
 						break
@@ -193,7 +191,7 @@ int main(int argc, char **argv)
 			//Display 'sad' image
 			
 			//Play 'sad' sounds
-			sc.playWave(path_to_sounds+"sad";
+			//sc.playWave(path_to_sounds+"sad";
 		}
 	}
 
