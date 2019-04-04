@@ -27,7 +27,17 @@ void bumperCB(const kobuki_msgs::BumperEvent::ConstPtr msg){
     else if(msg->bumper ==2)
 	    bumper.right = !bumper.right;
 }
+struct Wheel{
+	bool right,left;
+};
+struct Wheel Wheel = {0,0};
 
+void wheeldropCB(const kobuki_msgs::WheelDropEvent::ConstPtr msg){
+	if (msg-> wheel == 1)
+		wheel.right = !wheel.right;
+	else if(msg->wheel == 0)
+		wheel.left = !wheel.left;
+}
 //-------------------------------------------------------------
 
 int main(int argc, char **argv)
@@ -44,6 +54,7 @@ int main(int argc, char **argv)
 	//subscribers
 	ros::Subscriber follower = nh.subscribe("follower_velocity_smoother/smooth_cmd_vel", 10, &followerCB);
 	ros::Subscriber bumper = nh.subscribe("mobile_base/events/bumper", 10, &bumperCB);
+	ros::Subscriber wheeldrop = nh.subscribe("mobile_base/events/wheeldrop",10,&wheeldropCB)
 
 	imageTransporter rgbTransport("camera/image/", sensor_msgs::image_encodings::BGR8); //--for Webcam
 	//imageTransporter rgbTransport("camera/rgb/image_raw", sensor_msgs::image_encodings::BGR8); //--for turtlebot Camera
@@ -68,10 +79,10 @@ int main(int argc, char **argv)
 		//...................................
 		
 		//Sense (in priority)
-		if(bumper.left == 1 || bumper.right == 1 || bumper.centre == 1){
+		if(wheel.right == 1 || wheel.left == 1){
 			world_state  = 1;
 		}
-		else if{
+		else if(bumper.left == 1 || bumper.right == 1 || bumper.centre == 1){
 			//
 			world_state = 2;
 		}
@@ -104,10 +115,30 @@ int main(int argc, char **argv)
 
 		}
 		else if(world_state == 1){
-			/*
-			...
-			...
-			*/
+			if (wheel.left == 1 && wheel.right == 0){
+				//tilted right suprised image
+				sc.playWave(path_to_sounds+"alert.wav"); // change .wav file to suprised sound clip
+				sleep(1.0); // if we want soundclip to loop. set time to length of clip
+			}
+			else if (wheel.left == 0 && wheel.right == 1){
+				//tilted left suprised image
+				sc.playWave(path_to_sounds+"alert.wav"); // change .wav file to suprised sound clip
+				sleep(1.0); // if we want soundclip to loop. set time to length of clip
+			}
+			else if (wheel.left == 1 && wheel.right == 1){
+				// normal suprised image
+				vel.linear.x = 1
+				vel_pub.publish(vel);
+				sleep(3.0); // dont want to spin wheels endlessly otherwise when robot is placed on ground it will move.
+				
+				sc.playWave(path_to_sounds+"alert.wav"); // change .wav file to suprised sound clip
+				sleep(1.0); // if we want soundclip to loop. set time to length of clip
+			}
+			else if (wheel.left == 0 && wheel.right == 0 {
+				world_state = 0
+			}
+
+
 		}
 		else if(world_state == 2){
 
