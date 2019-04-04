@@ -2,13 +2,15 @@
 #include <ros/package.h>
 #include <imageTransporter.hpp>
 #include <kobuki_msgs/BumperEvent.h>
+#include <time.h>
 
 using namespace std;
 
+//Global Variables
 geometry_msgs::Twist follow_cmd;
 int world_state;
 
-
+// Callback Function
 void followerCB(const geometry_msgs::Twist msg){
     follow_cmd = msg;
 }
@@ -32,12 +34,23 @@ struct Wheel{
 };
 struct Wheel Wheel = {0,0};
 
+<<<<<<< HEAD
 void wheeldropCB(const kobuki_msgs::WheelDropEvent::ConstPtr msg){
 	if (msg-> wheel == 1)
 		wheel.right = !wheel.right;
 	else if(msg->wheel == 0)
 		wheel.left = !wheel.left;
 }
+=======
+//Helper Functions
+bool isLost(){
+	if(vel.angular.z==0 && vel.linear.x && vel.linear.y ==0)
+		return true;
+	else
+		return false;
+}
+
+>>>>>>> 49012f6b7956d5576904f8b23029185ebe4a37ec
 //-------------------------------------------------------------
 
 int main(int argc, char **argv)
@@ -90,9 +103,38 @@ int main(int argc, char **argv)
 			//
 			world_state = 3;
 		}
-		else if{
-			//
-			world_state = 4;
+		else if(isLost()){
+			//When loose track of person
+			clock_t t = clock();
+			bool foundPerson = false;
+
+			//look left for 2 seconds
+			while((clock()-t) < 2){
+				vel.angular.z=1;
+				vel_pub.publish(vel);
+				ros::spinOnce;
+				if(isLost()==false){
+					foundPerson = true;
+					break;
+			}
+			if(foundPerson == false){
+				//Display almost crying 
+			
+				//look right for 4 seconds
+				t = clock();
+				while((clock()-t) < 4){
+					vel.angular.z=-1;
+					vel.pub.publish(vel);
+					ros::spinOnce;
+					if(isLost()==true){
+						foundPerson = true;
+						break
+					}
+				}
+				//if still can't find person, do world_state 4 emotion
+				if(foundPerson == false)
+					world_state = 4;
+			}
 		}
 		else{
 			//keep following person
@@ -147,7 +189,11 @@ int main(int argc, char **argv)
 
 		}
 		else if(world_state ==4){
-
+			//Sad
+			//Display 'sad' image
+			
+			//Play 'sad' sounds
+			sc.playWave(path_to_sounds+"sad";
 		}
 	}
 
