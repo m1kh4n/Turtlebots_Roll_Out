@@ -8,12 +8,24 @@ using namespace std;
 geometry_msgs::Twist follow_cmd;
 int world_state;
 
+
 void followerCB(const geometry_msgs::Twist msg){
     follow_cmd = msg;
 }
 
+struct Bumper{
+	bool center, right, left;
+};
+struct Bumper bumper = {0,0,0};
+
 void bumperCB(const kobuki_msgs::BumperEvent::ConstPtr msg){
     //Fill with code
+    if(msg->bumper == 0)
+	    bumper.left = !bumper.left;
+    else if(msg->bumper == 1)
+	    bumper.centre = !bumper.centre;
+    else if(msg->bumper ==2)
+	    bumper.right = !bumper.right;
 }
 
 //-------------------------------------------------------------
@@ -52,10 +64,32 @@ int main(int argc, char **argv)
 	while(ros::ok()){
 		ros::spinOnce();
 		//.....**E-STOP DO NOT TOUCH**.......
-		//	eStop.block();
+		// eStop.block();
 		//...................................
-	
+		
+		//Sense (in priority)
+		if(bumper.left == 1 || bumper.right == 1 || bumper.centre == 1){
+			world_state  = 1;
+		}
+		else if{
+			//
+			world_state = 2;
+		}
+		else if{
+			//
+			world_state = 3;
+		}
+		else if{
+			//
+			world_state = 4;
+		}
+		else{
+			//keep following person
+			world_state = 0;
+		}
 
+	
+		//Emotion
 		if(world_state == 0){
 		//	fill with your code
 			vel_pub.publish(vel);
@@ -68,11 +102,21 @@ int main(int argc, char **argv)
 
 			sc.stopWave(path_to_sounds+"sound.wav");
 
-		}else if(world_state == 1){
+		}
+		else if(world_state == 1){
 			/*
 			...
 			...
 			*/
+		}
+		else if(world_state == 2){
+
+		}
+		else if(world_state == 3){
+
+		}
+		else if(world_state ==4){
+
 		}
 	}
 
