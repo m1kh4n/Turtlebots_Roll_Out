@@ -14,7 +14,6 @@ int world_state;
 void followerCB(const geometry_msgs::Twist msg){
     follow_cmd = msg;
 }
-
 struct Bumper{
 	bool center, right, left;
 };
