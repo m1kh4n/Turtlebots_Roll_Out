@@ -121,13 +121,13 @@ int main(int argc, char **argv)
                  }
                  */
             }
-            if (bumperRelease = false && seePlant = false){
+            if (bumperRelease == false && seePlant == false){
                 world_state = 2;
             }
-            else if (bumperRelease = true && seePlant = false){
+            else if (bumperRelease == true && seePlant == false){
                 world_state = 0;
             }
-            else if (seePlant = true){
+            else if (seePlant == true){
                 world_state = 3;
             }
             
@@ -152,7 +152,8 @@ int main(int argc, char **argv)
 				if(isLost()==false){
 					foundPerson = true;
 					break;
-			}
+                }
+            }
 			if(foundPerson == false){
 				//Display almost crying 
 			
