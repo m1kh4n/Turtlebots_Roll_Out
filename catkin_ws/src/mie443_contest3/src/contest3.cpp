@@ -104,8 +104,36 @@ int main(int argc, char **argv)
 			world_state  = 1;
 		}
 		else if(bumper.left == 1 || bumper.right == 1 || bumper.centre == 1){
-			//
-			world_state = 2;
+            clock_t t = clock();
+            bool bumperRelease = false;
+            bool seePlant = false;
+            
+            while((clock()-t)<3){
+                //if whithin 3 seconds, the obstacle is removed break.
+                if(bumper.left == 0 || bumper.right == 0 || bumper.centre == 0){
+                    bumperRelease = true;
+                    break;
+                }
+                /*
+                 if(see plant code here){
+                 seePlant = true;
+                 break;
+                 }
+                 */
+            }
+            if (bumperRelease = false && seePlant = false){
+                world_state = 2;
+            }
+            else if (bumperRelease = true && seePlant = false){
+                world_state = 0;
+            }
+            else if (seePlant = true){
+                world_state = 3;
+            }
+            
+            
+            
+            
 		}
 		else if(0){
 			//
