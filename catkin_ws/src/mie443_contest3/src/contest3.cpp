@@ -31,12 +31,12 @@ geometry_msgs::Twist vel;
 int world_state;
 
 //Load Images
-cv::Mat follow = imread("/filepath",CV_LOAD_IMAGE_COLOR);
-cv::Mat surprised = imread("/filepath",CV_LOAD_IMAGE_COLOR);
-cv::Mat angry = imread("/filepath",CV_LOAD_IMAGE_COLOR);
-cv::Mat happy = imread("/filepath",CV_LOAD_IMAGE_COLOR);
-cv::Mat sad1 = imread("/filepath",CV_LOAD_IMAGE_COLOR);
-cv::Mat sad2 = imread("/filepath",CV_LOAD_IMAGE_COLOR);
+cv::Mat follow = imread("/images/plant.jpg",CV_LOAD_IMAGE_COLOR);
+cv::Mat surprised = imread("/images/plant.jpg",CV_LOAD_IMAGE_COLOR);
+cv::Mat angry = imread("/images/plant.jpg",CV_LOAD_IMAGE_COLOR);
+cv::Mat happy = imread("/images/plant.jpg",CV_LOAD_IMAGE_COLOR);
+cv::Mat sad1 = imread("/images/plant.jpg",CV_LOAD_IMAGE_COLOR);
+cv::Mat sad2 = imread("/images/plant.jpg",CV_LOAD_IMAGE_COLOR);
 
 // Callback Function
 void followerCB(const geometry_msgs::Twist msg){
@@ -155,7 +155,7 @@ int main(int argc, char **argv)
             vel_pub.publish(vel);
             
             //Check if see plant for 3 seconds
-            cv::Mat plant = imread("/path/to/image.jpg", IMREAD_GRAYSCALE); //CHANGE IMAGE PATH
+            cv::Mat plant = imread("/images/plant.jpg", IMREAD_GRAYSCALE); //CHANGE IMAGE PATH
             cv::Mat descriptorPlant;
             vector<KeyPoint> keypointsPlant;
             int minHessian = 400;

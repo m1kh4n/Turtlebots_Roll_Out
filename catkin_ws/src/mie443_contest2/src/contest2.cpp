@@ -98,7 +98,7 @@ int main(int argc, char** argv) {
                   << boxes.coords[i][2] << std::endl;
     }
 
-    // Initialize image objectand subscriber.
+    // Initialize image object and subscriber.
     ImagePipeline imagePipeline(n);
 
     // Execute strategy - Optimate Sequence then Navigate to catpure image
