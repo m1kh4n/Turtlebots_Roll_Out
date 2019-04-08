@@ -51,7 +51,7 @@ int ImagePipeline::getTemplateID(Boxes& boxes) {
     } else {
         /***YOUR CODE HERE***/
         // Use: boxes.templates
-	template_id = 3;
+        template_id = 3;
         Mat Raisin = boxes.templates[0];
         Mat Cinnamon = boxes.templates[1];
         Mat Rice = boxes.templates[2];
