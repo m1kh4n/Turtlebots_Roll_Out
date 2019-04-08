@@ -5,7 +5,7 @@
 //  Created by Albert Liu on 2019-04-08.
 //
 
-#pragma once
+//#pragma once
 
 #include <image_transport/image_transport.h>
 #include <std_msgs/String.h>

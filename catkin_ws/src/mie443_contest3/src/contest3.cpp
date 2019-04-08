@@ -96,7 +96,7 @@ int main(int argc, char **argv)
     //Initialize and Declare Ros Topic Variables
 	ros::init(argc, argv, "image_listener");
 	ros::NodeHandle nh;
-	ros::NodeHandle n;
+	//ros::NodeHandle n;
 	sound_play::SoundClient sc;
 	string path_to_sounds = ros::package::getPath("mie443_contest3") + "/sounds/";
 	teleController eStop;
@@ -114,7 +114,7 @@ int main(int argc, char **argv)
 	//imageTransporter rgbTransport("camera/rgb/image_raw", sensor_msgs::image_encodings::BGR8); //--for turtlebot Camera
 	imageTransporter depthTransport("camera/depth_registered/image_raw", sensor_msgs::image_encodings::TYPE_32FC1);
 
-	ImagePipeline imagePipeline(n);
+	ImagePipeline imagePipeline(nh);
 
     //Initialize Variables at Startup
 	int world_state = 0;
