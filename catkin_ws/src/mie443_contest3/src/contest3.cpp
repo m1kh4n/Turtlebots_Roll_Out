@@ -1,6 +1,7 @@
 #include <header.h>
 #include <ros/package.h>
 #include <imageTransporter.hpp>
+#include <imagePipeline.h>
 #include <kobuki_msgs/BumperEvent.h>
 #include <time.h>
 #include "opencv2/core.hpp"
@@ -82,6 +83,7 @@ int main(int argc, char **argv)
 {
 	ros::init(argc, argv, "image_listener");
 	ros::NodeHandle nh;
+	ros::NodeHandle n;
 	sound_play::SoundClient sc;
 	string path_to_sounds = ros::package::getPath("mie443_contest3") + "/sounds/";
 	teleController eStop;
@@ -97,6 +99,8 @@ int main(int argc, char **argv)
 	imageTransporter rgbTransport("camera/image/", sensor_msgs::image_encodings::BGR8); //--for Webcam
 	//imageTransporter rgbTransport("camera/rgb/image_raw", sensor_msgs::image_encodings::BGR8); //--for turtlebot Camera
 	imageTransporter depthTransport("camera/depth_registered/image_raw", sensor_msgs::image_encodings::TYPE_32FC1);
+
+	ImagePipeline imagePipeline(n);
 
 	int world_state = 0;
 
@@ -135,7 +139,7 @@ int main(int argc, char **argv)
                 //see plant when bumper is pressed means not mad
                 else if(){
                     int seePlant = 0;
-                    cv::Mat sceneImage = imageTransporter.getImg();
+                    cv::Mat sceneImage = imagePipeline.getImg();
                     cv::Mat plant = imread("/path/to/image.jpg", IMREAD_GRAYSCALE);
 
                     int minHessian = 400;
@@ -261,10 +265,6 @@ int main(int argc, char **argv)
 
 
 
-		}
-		else if(0){
-			//
-			world_state = 3;
 		}
 		else if(isLost()){
 			//When loose track of person
