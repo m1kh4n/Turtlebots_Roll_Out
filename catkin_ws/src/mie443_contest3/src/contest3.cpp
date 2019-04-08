@@ -41,7 +41,7 @@ void bumperCB(const kobuki_msgs::BumperEvent::ConstPtr msg){
     if(msg->bumper == 0)
 	    bumper.left = !bumper.left;
     else if(msg->bumper == 1)
-	    bumper.center = !bumper.centre;
+	    bumper.centre = !bumper.centre;
     else if(msg->bumper ==2)
 	    bumper.right = !bumper.right;
 }
@@ -141,14 +141,14 @@ int main(int argc, char **argv)
                     int minHessian = 400;
                     cv::Ptr<SURF> detector = SURF::create(minHessian);
                     vector<KeyPoint> keypointsSceneImage, keypointsPlant;
-                    cv::detector->detect(sceneImage, keypointsSceneImage);
-                    cv::detector->detect(plant, keypointsPlant);
+                    cv::xfeatures2d::detector->detect(sceneImage, keypointsSceneImage);
+                    cv::xfeatures2d::detector->detect(plant, keypointsPlant);
 
                     cv::Ptr<SURF> extractor = SURF::create();
                     cv::Mat descriptorSceneImage;
                     cv::Mat descriptorPlant;
-                    cv::extractor->compute(sceneImage, keypointsSceneImage, descriptorSceneImage);
-                    cv::extractor->compute(plant, keypointsPlant, descriptorPlant);
+                    cv::xfeatures2d::extractor->compute(sceneImage, keypointsSceneImage, descriptorSceneImage);
+                    cv::xfeatures2d::extractor->compute(plant, keypointsPlant, descriptorPlant);
 
                     int notEnoughMatches = 0;
                     cv::FlannBasedMatcher matcher;
@@ -288,11 +288,11 @@ int main(int argc, char **argv)
 				t = clock();
 				while((clock()-t) < 4){
 					vel.angular.z=-1;
-					vel.pub.publish(vel);
+					vel_pub.publish(vel);
 					ros::spinOnce();
 					if(isLost()==true){
 						foundPerson = true;
-						break
+                        break;
 					}
 				}
 				//if still can't find person, do world_state 4 emotion
@@ -342,7 +342,7 @@ int main(int argc, char **argv)
 			    clock_t t = clock();
           while((clock()-t) < 3){
   					vel.angular.x= -1;
-  					vel.pub.publish(vel);
+  					vel_pub.publish(vel);
             if (wheelLeft == 0 && wheelRight == 0)
             break;
           }
