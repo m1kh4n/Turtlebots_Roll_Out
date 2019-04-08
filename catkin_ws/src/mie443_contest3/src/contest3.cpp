@@ -22,6 +22,7 @@ using namespace cv::xfeatures2d;
 
 //Global Variables
 geometry_msgs::Twist follow_cmd;
+geometry_msgs::Twist vel;
 int world_state;
 
 // Callback Function
@@ -29,7 +30,9 @@ void followerCB(const geometry_msgs::Twist msg){
     follow_cmd = msg;
 }
 struct Bumper{
-	bool center, right, left;
+    bool centre;
+    bool right;
+    bool left;
 };
 struct Bumper bumper = {0,0,0};
 
@@ -38,7 +41,7 @@ void bumperCB(const kobuki_msgs::BumperEvent::ConstPtr msg){
     if(msg->bumper == 0)
 	    bumper.left = !bumper.left;
     else if(msg->bumper == 1)
-	    bumper.center = !bumper.center;
+	    bumper.center = !bumper.centre;
     else if(msg->bumper ==2)
 	    bumper.right = !bumper.right;
 }
@@ -48,21 +51,21 @@ bool wheelLeft=0;
 
 void wheeldropCB(const kobuki_msgs::WheelDropEvent::ConstPtr msg){
 	if (msg-> state == 1){
-    if (msg-> wheel == 1){
-      wheelRight = 1
+        if (msg-> wheel == 1){
+            wheelRight = 1;
+        }
+        else if (msg-> wheel == 0){
+            wheelLeft = 1;
+        }
     }
-    else if (msg-> wheel == 0){
-      wheelLeft = 1;
+    else if (msg -> state == 0){
+        if (msg-> wheel == 1){
+            wheelRight = 0;
+        }
+        else if (msg-> wheel == 0){
+            wheelLeft = 0;
+        }
     }
-  }
-  else if (msg -> state == 0){
-    if (msg-> wheel == 1){
-      wheelRight = 0;
-    }
-    else if (msg-> wheel == 0){
-      wheelLeft = 0;
-    }
-  }
 }
 
 //Helper Functions
@@ -89,7 +92,7 @@ int main(int argc, char **argv)
 	//subscribers
 	ros::Subscriber follower = nh.subscribe("follower_velocity_smoother/smooth_cmd_vel", 10, &followerCB);
 	ros::Subscriber bumper = nh.subscribe("mobile_base/events/bumper", 10, &bumperCB);
-	ros::Subscriber wheeldrop = nh.subscribe("mobile_base/events/wheeldrop",10,&wheeldropCB)
+    ros::Subscriber wheeldrop = nh.subscribe("mobile_base/events/wheeldrop",10,&wheeldropCB);
 
 	imageTransporter rgbTransport("camera/image/", sensor_msgs::image_encodings::BGR8); //--for Webcam
 	//imageTransporter rgbTransport("camera/rgb/image_raw", sensor_msgs::image_encodings::BGR8); //--for turtlebot Camera
@@ -130,7 +133,7 @@ int main(int argc, char **argv)
                     break;
                 }
                 //see plant when bumper is pressed means not mad
-                else if {
+                else if(){
                     int seePlant = 0;
                     cv::Mat sceneImage = imageTransporter.getImg();
                     cv::Mat plant = imread("/path/to/image.jpg", IMREAD_GRAYSCALE);
@@ -368,117 +371,3 @@ int main(int argc, char **argv)
 	return 0;
 }
 
-// Image Detection Code, put wherever necessary
-{
-    int matchFlag = 0;
-    cv::Mat sceneImage = imageTransporter.getImg();
-    cv::Mat plant = imread("/path/to/image.jpg", IMREAD_GRAYSCALE);
-
-    int minHessian = 400;
-    Ptr<SURF> detector = SURF::create(minHessian);
-    vector<KeyPoint> keypointsSceneImage, keypointsPlant;
-    detector->detect(sceneImage, keypointsSceneImage);
-    detector->detect(plant, keypointsPlant);
-
-    Ptr<SURF> extractor = SURF::create();
-    Mat descriptorSceneImage;
-    Mat descriptorPlant;
-    extractor->compute(sceneImage, keypointsSceneImage, descriptorSceneImage);
-    extractor->compute(plant, keypointsPlant, descriptorPlant);
-
-    int notEnoughMatches = 0;
-    FlannBasedMatcher matcher;
-    std::vector<DMatch> matches;
-    matcher.match(descriptorPlant, descriptorSceneImage, matches);
-
-    double max_dist = 0; double min_dist = 100;
-    for( int i = 0; i < descriptorPlant.rows; i++ ){
-        double dist = matches[i].distance;
-        if( dist < min_dist ) min_dist = dist;
-        if( dist > max_dist ) max_dist = dist;
-    }
-    std::vector<DMatch>good_matches;
-
-    for(int i = 0; i < descriptorPlant.rows; i++){
-        if( matches[i].distance <= max(2*min_dist, 0.02) ){
-            good_matches.push_back( matches[i]);
-        }
-    }
-    Mat img_matches;
-    drawMatches(plant, keypointsPlant, sceneImage, keypointsSceneImage,
-                good_matches, img_matches, Scalar::all(-1), Scalar::all(-1),
-                std::vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
-
-    if(good_matches.size() < 10) notEnoughMatches = 1;
-    std::vector<Point2f>obj;
-    std::vector<Point2f>scene;
-
-    int HMDFlag = 0; int CNFlag = 0;
-    int rows; int cols;
-    double conditionNumber;
-    Mat homographyMatrix, singularValues, U, Vt = Mat();
-    std::vector<Point2f> obj_corners(4);
-    std::vector<Point2f> scene_corners(4);
-    Size s;
-
-    if(!notEnoughMatches){
-
-        for(int i = 0; i<good_matches.size(); i++){
-            //-- Get the keypoints from the good matches
-            obj.push_back(keypointsPlant[good_matches[i].queryIdx].pt);
-            scene.push_back(keypointsSceneImage[good_matches[i].trainIdx].pt);
-        }
-
-        //-- Get homography matrix
-        homographyMatrix = findHomography(obj,scene,RANSAC);
-
-        //-- Get the corners from the image_1 ( the object to be "detected" )
-        obj_corners[0] = cvPoint(0,0); obj_corners[1] = cvPoint(plant.cols, 0);
-        obj_corners[2] = cvPoint(plant.cols, plant.rows); obj_corners[3] = cvPoint(0, plant.rows);
-
-        perspectiveTransform( obj_corners, scene_corners, homographyMatrix);
-
-        //-- Draw lines between the corners (the mapped object in the scene - image_2 )
-        line( img_matches, scene_corners[0] + Point2f( plant.cols, 0), scene_corners[1] + Point2f( plant.cols, 0), Scalar(0, 255, 0), 4 );
-        line( img_matches, scene_corners[1] + Point2f( plant.cols, 0), scene_corners[2] + Point2f( plant.cols, 0), Scalar( 0, 255, 0), 4 );
-        line( img_matches, scene_corners[2] + Point2f( plant.cols, 0), scene_corners[3] + Point2f( plant.cols, 0), Scalar( 0, 255, 0), 4 );
-        line( img_matches, scene_corners[3] + Point2f( plant.cols, 0), scene_corners[0] + Point2f( plant.cols, 0), Scalar( 0, 255, 0), 4 );
-
-        //-- Show detected matches
-        //imshow( "Good Matches & Homography Calculation", img_matches );
-
-        for( int i = 0; i < (int)good_matches.size(); i++ ){
-            //printf( "-- Good Match [%d] Keypoint 1: %d  -- Keypoint 2: %d  \n", i, good_matches[i].queryIdx, good_matches[i].trainIdx );
-        }
-
-        std::cout << "Homography Matrix = " << std::endl << " " << homographyMatrix << std::endl;
-
-        //-- Check determinant of the matrix to see if its too close to zero
-        double HMDeterminant = determinant(homographyMatrix);
-        if (HMDeterminant>0.1) HMDFlag = 1;
-        else HMDFlag = 0;
-        std::cout << "Determinant of matrix is: " << HMDeterminant << std::endl;
-
-        //-- DO SVD on homography matrix and check its values
-        singularValues = Mat();
-        U, Vt = Mat();
-        CNFlag = 0;
-        SVDecomp(homographyMatrix, singularValues, U, Vt, 2);
-
-        std::cout << "Printing the singular values of the homography matrix: " << std::endl;
-        s = singularValues.size();
-        rows = s.height;
-        cols = s.width;
-        for (int i = 0; i < rows; i++)
-            for(int j = 0; j < cols; j++){
-                std::cout << "Element at " << i << " and " << j << " is " << singularValues.at<double>(i,j) << std::endl;
-            }
-        conditionNumber = singularValues.at<double>(0,0)/singularValues.at<double>(2,0);
-        std::cout << "Condition number is: " << conditionNumber << std::endl;
-        if(conditionNumber <= 10000000){
-            std::cout << "Condition number check passed" << std::endl;
-            CNFlag = 1;
-        }
-    }
-    if(CNFlag == 1 && HMDFlag == 1) matchFlag = 1;
-}
