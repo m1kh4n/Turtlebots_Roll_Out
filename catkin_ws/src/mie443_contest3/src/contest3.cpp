@@ -30,6 +30,7 @@ int world_state;
 void followerCB(const geometry_msgs::Twist msg){
     follow_cmd = msg;
 }
+
 struct Bumper{
     bool centre;
     bool right;
@@ -81,6 +82,7 @@ bool isLost(){
 
 int main(int argc, char **argv)
 {
+    //Initialize and Declare Ros Topic Variables
 	ros::init(argc, argv, "image_listener");
 	ros::NodeHandle nh;
 	ros::NodeHandle n;
