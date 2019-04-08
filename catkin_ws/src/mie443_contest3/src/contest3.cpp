@@ -27,12 +27,12 @@ geometry_msgs::Twist vel;
 int world_state;
 
 //Load Images
-cv:Mat follow = imread(filepath,CV_LOAD_IMAGE_COLOR);
-cv:Mat suprised = imread(filepath,CV_LOAD_IMAGE_COLOR);
-cv:Mat angry = imread(filepath,CV_LOAD_IMAGE_COLOR);
-cv:Mat happy = imread(filepath,CV_LOAD_IMAGE_COLOR);
-cv:Mat sad1 = imread(filepath,CV_LOAD_IMAGE_COLOR);
-cv:Mat sad2 = imread(filepath,CV_LOAD_IMAGE_COLOR);
+cv::Mat follow = imread("/filepath",CV_LOAD_IMAGE_COLOR);
+cv::Mat suprised = imread("/filepath",CV_LOAD_IMAGE_COLOR);
+cv::Mat angry = imread("/filepath",CV_LOAD_IMAGE_COLOR);
+cv::Mat happy = imread("/filepath",CV_LOAD_IMAGE_COLOR);
+cv::Mat sad1 = imread("/filepath",CV_LOAD_IMAGE_COLOR);
+cv::Mat sad2 = imread("/filepath",CV_LOAD_IMAGE_COLOR);
 
 // Callback Function
 void followerCB(const geometry_msgs::Twist msg){
@@ -153,19 +153,19 @@ int main(int argc, char **argv)
             cv::Mat plant = imread("/path/to/image.jpg", IMREAD_GRAYSCALE); //CHANGE IMAGE PATH
             cv::Mat descriptorPlant;
             vector<KeyPoint> keypointsPlant;
+            int minHessian = 400;
+            cv::Ptr<SURF> detector = SURF::create(minHessian);
+            cv::Ptr<SURF> extractor = SURF::create();
             detector->detect(plant, keypointsPlant);
             extractor->compute(plant, keypointsPlant, descriptorPlant);
             while((clock()-t)<3){
                 //see plant when bumper is pressed means not mad
                 int seePlant = 0;
                 cv::Mat sceneImage = imagePipeline.getImg();
-
-                int minHessian = 400;
-                cv::Ptr<SURF> detector = SURF::create(minHessian);
+                
                 vector<KeyPoint> keypointsSceneImage;
                 detector->detect(sceneImage, keypointsSceneImage);
 
-                cv::Ptr<SURF> extractor = SURF::create();
                 cv::Mat descriptorSceneImage;
                 extractor->compute(sceneImage, keypointsSceneImage, descriptorSceneImage);
 
@@ -270,7 +270,7 @@ int main(int argc, char **argv)
             if (seePlant == 1){
                 world_state = 3;
             }
-            else if(bumper.left == 1 || bumper.right == 1 || bumper.centre == 1){
+            else if(bumperState.left == 1 || bumperState.right == 1 || bumperState.centre == 1){
                 world_state = 2;
             }
 		}
@@ -293,7 +293,7 @@ int main(int argc, char **argv)
             //if still lost, look right for 4 seconds
 			if(foundPerson == false){
 				//Display almost crying
-                imshow("Display Window",sad1)
+                imshow("Display Window",sad1);
 
 				//look right for 4 seconds
 				t = clock();
@@ -333,7 +333,7 @@ int main(int argc, char **argv)
 		}
         //1.Suprised
         else if(world_state == 1){
-            imshow("Display Window",sad);
+            imshow("Display Window",surpised);
             if (wheelLeft == 1 && wheelRight == 0){
   				//tilted right suprised image
   				sc.playWave(path_to_sounds+"suprised.wav"); // change .wav file to suprised sound clip
@@ -376,7 +376,7 @@ int main(int argc, char **argv)
             //Move back for 1 second
             while((clock()-t) < 1){
                 vel.angular.x= -1;
-                vel.pub.publish(vel);
+                vel_pub.publish(vel);
             }
 
             //Shake angrily 6 times.
@@ -384,7 +384,7 @@ int main(int argc, char **argv)
                 int j = -1;
                 while((clock()-t) < 0.5)
                     vel.angular.z *= j;
-                vel.pub.publish(vel);
+                vel_pub.publish(vel);
             }
             sc.stopWave(path_to_sounds+"angry.wav");
 		}
@@ -399,20 +399,20 @@ int main(int argc, char **argv)
             //Move back
             while((clock()-t) < 1){
                 vel.angular.x= -1;
-                vel.pub.publish(vel);
+                vel_pub.publish(vel);
             }
             
             //Continuous rotation
             while((clock()-t) < 5){
                 vel.angular.z =1;
-                vel.pub.publish(vel);
+                vel_pub.publish(vel);
             }
             sc.stopWave(path_to_sounds+"happy.wav");
 		}
         //4. Sad
 		else if(world_state ==4){
 			//Display 'sad' image
-            cv::imshow("Display Window",sad);
+            cv::imshow("Display Window",sad2);
 
 			//Play 'sad' sounds
             sc.playWave(path_to_sounds+"sad.wav");
