@@ -34,16 +34,16 @@ struct Bumper{
     bool right;
     bool left;
 };
-struct Bumper bumper = {0,0,0};
+struct Bumper bumperState = {0,0,0};
 
 void bumperCB(const kobuki_msgs::BumperEvent::ConstPtr msg){
     //Fill with code
     if(msg->bumper == 0)
-	    bumper.left = !bumper.left;
+	    bumperState.left = !bumperState.left;
     else if(msg->bumper == 1)
-	    bumper.centre = !bumper.centre;
+	    bumperState.centre = !bumperState.centre;
     else if(msg->bumper ==2)
-	    bumper.right = !bumper.right;
+	    bumperState.right = !bumperState.right;
 }
 
 bool wheelRight = 0;
@@ -121,14 +121,14 @@ int main(int argc, char **argv)
 		if(wheelRight == 1 || wheelLeft == 1){
 			world_state  = 1;
 		}
-		else if(bumper.left == 1 || bumper.right == 1 || bumper.centre == 1){
+		else if(bumperState.left == 1 || bumperState.right == 1 || bumperState.centre == 1){
             clock_t t = clock();
             bool bumperRelease = false;
             bool seePlant = false;
 
             while((clock()-t)<3){
                 //if whithin 3 seconds, the obstacle is removed break.
-                if(bumper.left == 0 || bumper.right == 0 || bumper.centre == 0){
+                if(bumperState.left == 0 || bumperState.right == 0 || bumperState.centre == 0){
                     bumperRelease = true;
                     break;
                 }
@@ -141,14 +141,14 @@ int main(int argc, char **argv)
                     int minHessian = 400;
                     cv::Ptr<SURF> detector = SURF::create(minHessian);
                     vector<KeyPoint> keypointsSceneImage, keypointsPlant;
-                    cv::xfeatures2d::detector->detect(sceneImage, keypointsSceneImage);
-                    cv::xfeatures2d::detector->detect(plant, keypointsPlant);
+                    detector->detect(sceneImage, keypointsSceneImage);
+                    detector->detect(plant, keypointsPlant);
 
                     cv::Ptr<SURF> extractor = SURF::create();
                     cv::Mat descriptorSceneImage;
                     cv::Mat descriptorPlant;
-                    cv::xfeatures2d::extractor->compute(sceneImage, keypointsSceneImage, descriptorSceneImage);
-                    cv::xfeatures2d::extractor->compute(plant, keypointsPlant, descriptorPlant);
+                    extractor->compute(sceneImage, keypointsSceneImage, descriptorSceneImage);
+                    extractor->compute(plant, keypointsPlant, descriptorPlant);
 
                     int notEnoughMatches = 0;
                     cv::FlannBasedMatcher matcher;
