@@ -26,6 +26,14 @@ geometry_msgs::Twist follow_cmd;
 geometry_msgs::Twist vel;
 int world_state;
 
+//Load Images
+cv:Mat follow = imread(filepath,CV_LOAD_IMAGE_COLOR);
+cv:Mat suprised = imread(filepath,CV_LOAD_IMAGE_COLOR);
+cv:Mat angry = imread(filepath,CV_LOAD_IMAGE_COLOR);
+cv:Mat happy = imread(filepath,CV_LOAD_IMAGE_COLOR);
+cv:Mat sad1 = imread(filepath,CV_LOAD_IMAGE_COLOR);
+cv:Mat sad2 = imread(filepath,CV_LOAD_IMAGE_COLOR);
+
 // Callback Function
 void followerCB(const geometry_msgs::Twist msg){
     follow_cmd = msg;
@@ -78,8 +86,7 @@ bool isLost(){
 		return false;
 }
 
-//-------------------------------------------------------------
-
+//Main Function
 int main(int argc, char **argv)
 {
     //Initialize and Declare Ros Topic Variables
@@ -90,20 +97,22 @@ int main(int argc, char **argv)
 	string path_to_sounds = ros::package::getPath("mie443_contest3") + "/sounds/";
 	teleController eStop;
 
-	//publishers
+	//Initialize Publishers
 	ros::Publisher vel_pub = nh.advertise<geometry_msgs::Twist>("cmd_vel_mux/input/teleop",1);
 
-	//subscribers
+	//Initialize Subscribers
 	ros::Subscriber follower = nh.subscribe("follower_velocity_smoother/smooth_cmd_vel", 10, &followerCB);
 	ros::Subscriber bumper = nh.subscribe("mobile_base/events/bumper", 10, &bumperCB);
     ros::Subscriber wheeldrop = nh.subscribe("mobile_base/events/wheeldrop",10,&wheeldropCB);
 
+    //Initialize imageTransport and imagePipeline
 	imageTransporter rgbTransport("camera/image/", sensor_msgs::image_encodings::BGR8); //--for Webcam
 	//imageTransporter rgbTransport("camera/rgb/image_raw", sensor_msgs::image_encodings::BGR8); //--for turtlebot Camera
 	imageTransporter depthTransport("camera/depth_registered/image_raw", sensor_msgs::image_encodings::TYPE_32FC1);
 
 	ImagePipeline imagePipeline(n);
 
+    //Initialize Variables at Startup
 	int world_state = 0;
 
 	double angular = 0.2;
@@ -112,162 +121,160 @@ int main(int argc, char **argv)
 	geometry_msgs::Twist vel;
 	vel.angular.z = angular;
 	vel.linear.x = linear;
-
-// can probably use a diff sound on start up.
+    
+    //Play startup sound
 	sc.playWave(path_to_sounds + "sound.wav");
 	ros::Duration(0.5).sleep();
 
+    //Turtlebot Operation Loop
 	while(ros::ok()){
 		ros::spinOnce();
 		//.....**E-STOP DO NOT TOUCH**.......
 		// eStop.block();
 		//...................................
 
-		//Sense (in priority)
+		//Wall-E Senses
+        //1. Detect if Wall-E picked up
 		if(wheelRight == 1 || wheelLeft == 1){
-			world_state  = 1;
+			world_state = 1;
 		}
+        //2&3.Detect if Wall-E hit into something. Then check if plant or obstacle in front
 		else if(bumperState.left == 1 || bumperState.right == 1 || bumperState.centre == 1){
             clock_t t = clock();
-            bool bumperRelease = false;
             bool seePlant = false;
-
+            
+            //Stop first
+            vel.angular.z=0;
+            vel.linear.x=0;
+            vel.linear.y=0;
+            vel_pub.publish(vel);
+            
+            //Check if see plant for 3 seconds
+            cv::Mat plant = imread("/path/to/image.jpg", IMREAD_GRAYSCALE); //CHANGE IMAGE PATH
+            cv::Mat descriptorPlant;
+            vector<KeyPoint> keypointsPlant;
+            detector->detect(plant, keypointsPlant);
+            extractor->compute(plant, keypointsPlant, descriptorPlant);
             while((clock()-t)<3){
-                //if whithin 3 seconds, the obstacle is removed break.
-                if(bumperState.left == 0 || bumperState.right == 0 || bumperState.centre == 0){
-                    bumperRelease = true;
-                    break;
-                }
                 //see plant when bumper is pressed means not mad
-                else if(){
-                    int seePlant = 0;
-                    cv::Mat sceneImage = imagePipeline.getImg();
-                    cv::Mat plant = imread("/path/to/image.jpg", IMREAD_GRAYSCALE);
+                int seePlant = 0;
+                cv::Mat sceneImage = imagePipeline.getImg();
 
-                    int minHessian = 400;
-                    cv::Ptr<SURF> detector = SURF::create(minHessian);
-                    vector<KeyPoint> keypointsSceneImage, keypointsPlant;
-                    detector->detect(sceneImage, keypointsSceneImage);
-                    detector->detect(plant, keypointsPlant);
+                int minHessian = 400;
+                cv::Ptr<SURF> detector = SURF::create(minHessian);
+                vector<KeyPoint> keypointsSceneImage;
+                detector->detect(sceneImage, keypointsSceneImage);
 
-                    cv::Ptr<SURF> extractor = SURF::create();
-                    cv::Mat descriptorSceneImage;
-                    cv::Mat descriptorPlant;
-                    extractor->compute(sceneImage, keypointsSceneImage, descriptorSceneImage);
-                    extractor->compute(plant, keypointsPlant, descriptorPlant);
+                cv::Ptr<SURF> extractor = SURF::create();
+                cv::Mat descriptorSceneImage;
+                extractor->compute(sceneImage, keypointsSceneImage, descriptorSceneImage);
 
-                    int notEnoughMatches = 0;
-                    cv::FlannBasedMatcher matcher;
-                    vector<DMatch> matches;
-                    matcher.match(descriptorPlant, descriptorSceneImage, matches);
+                int notEnoughMatches = 0;
+                cv::FlannBasedMatcher matcher;
+                vector<DMatch> matches;
+                matcher.match(descriptorPlant, descriptorSceneImage, matches);
 
-                    double max_dist = 0; double min_dist = 100;
-                    for( int i = 0; i < descriptorPlant.rows; i++ ){
-                        double dist = matches[i].distance;
-                        if( dist < min_dist ) min_dist = dist;
-                        if( dist > max_dist ) max_dist = dist;
+                double max_dist = 0; double min_dist = 100;
+                for( int i = 0; i < descriptorPlant.rows; i++ ){
+                    double dist = matches[i].distance;
+                    if( dist < min_dist ) min_dist = dist;
+                    if( dist > max_dist ) max_dist = dist;
+                }
+                vector<DMatch>good_matches;
+                for(int i = 0; i < descriptorPlant.rows; i++){
+                    if( matches[i].distance <= max(2*min_dist, 0.02) ){
+                        good_matches.push_back( matches[i]);
                     }
-                    vector<DMatch>good_matches;
-
-                    for(int i = 0; i < descriptorPlant.rows; i++){
-                        if( matches[i].distance <= max(2*min_dist, 0.02) ){
-                            good_matches.push_back( matches[i]);
-                        }
-                    }
-                    cv::Mat img_matches;
-                    cv::drawMatches(plant, keypointsPlant, sceneImage, keypointsSceneImage,
+                }
+                cv::Mat img_matches;
+                cv::drawMatches(plant, keypointsPlant, sceneImage, keypointsSceneImage,
                                 good_matches, img_matches, Scalar::all(-1), Scalar::all(-1),
-                                std::vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
+                                std::vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
 
-                    if(good_matches.size() < 10) notEnoughMatches = 1;
-                    vector<Point2f>obj;
-                    vector<Point2f>scene;
+                if(good_matches.size() < 10) notEnoughMatches = 1;
+                vector<Point2f>obj;
+                vector<Point2f>scene;
 
-                    int HMDFlag = 0; int CNFlag = 0;
-                    int rows; int cols;
-                    double conditionNumber;
-                    cv::Mat homographyMatrix, singularValues, U, Vt = Mat();
-                    std::vector<Point2f> obj_corners(4);
-                    std::vector<Point2f> scene_corners(4);
-                    cv::Size s;
+                int HMDFlag = 0; int CNFlag = 0;
+                int rows; int cols;
+                double conditionNumber;
+                cv::Mat homographyMatrix, singularValues, U, Vt = Mat();
+                std::vector<Point2f> obj_corners(4);
+                std::vector<Point2f> scene_corners(4);
+                cv::Size s;
 
-                    if(!notEnoughMatches){
+                if(!notEnoughMatches){
 
-                        for(int i = 0; i<good_matches.size(); i++){
-                            //-- Get the keypoints from the good matches
-                            obj.push_back(keypointsPlant[good_matches[i].queryIdx].pt);
-                            scene.push_back(keypointsSceneImage[good_matches[i].trainIdx].pt);
+                    for(int i = 0; i<good_matches.size(); i++){
+                        //-- Get the keypoints from the good matches
+                        obj.push_back(keypointsPlant[good_matches[i].queryIdx].pt);
+                        scene.push_back(keypointsSceneImage[good_matches[i].trainIdx].pt);
+                    }
+
+                    //-- Get homography matrix
+                    homographyMatrix = cv::findHomography(obj,scene,RANSAC);
+
+                    //-- Get the corners from the image_1 ( the object to be "detected" )
+                    obj_corners[0] = cvPoint(0,0); obj_corners[1] = cvPoint(plant.cols, 0);
+                    obj_corners[2] = cvPoint(plant.cols, plant.rows); obj_corners[3] = cvPoint(0, plant.rows);
+
+                    cv::perspectiveTransform( obj_corners, scene_corners, homographyMatrix);
+
+                    //-- Draw lines between the corners (the mapped object in the scene - image_2 )
+                    cv::line( img_matches, scene_corners[0] + Point2f( plant.cols, 0), scene_corners[1] + Point2f( plant.cols, 0), Scalar(0, 255, 0), 4 );
+                    cv::line( img_matches, scene_corners[1] + Point2f( plant.cols, 0), scene_corners[2] + Point2f( plant.cols, 0), Scalar( 0, 255, 0), 4 );
+                    cv::line( img_matches, scene_corners[2] + Point2f( plant.cols, 0), scene_corners[3] + Point2f( plant.cols, 0), Scalar( 0, 255, 0), 4 );
+                    cv::line( img_matches, scene_corners[3] + Point2f( plant.cols, 0), scene_corners[0] + Point2f( plant.cols, 0), Scalar( 0, 255, 0), 4 );
+                    //-- Show detected matches
+                    //imshow( "Good Matches & Homography Calculation", img_matches );
+
+                    for( int i = 0; i < (int)good_matches.size(); i++ ){
+                        //printf( "-- Good Match [%d] Keypoint 1: %d  -- Keypoint 2: %d  \n", i, good_matches[i].queryIdx, good_matches[i].trainIdx );
+                    }
+
+                    std::cout << "Homography Matrix = " << std::endl << " " << homographyMatrix << std::endl;
+
+                    //-- Check determinant of the matrix to see if its too close to zero
+                    double HMDeterminant = cv::determinant(homographyMatrix);
+                    if (HMDeterminant>0.1) HMDFlag = 1;
+                    else HMDFlag = 0;
+                    std::cout << "Determinant of matrix is: " << HMDeterminant << std::endl;
+
+                    //-- DO SVD on homography matrix and check its values
+                    singularValues = cv::Mat();
+                    U, Vt = cv::Mat();
+                    CNFlag = 0;
+                    cv::SVDecomp(homographyMatrix, singularValues, U, Vt, 2);
+
+                    std::cout << "Printing the singular values of the homography matrix: " << std::endl;
+                    s = singularValues.size();
+                    rows = s.height;
+                    cols = s.width;
+                    for (int i = 0; i < rows; i++)
+                        for(int j = 0; j < cols; j++){
+                            std::cout << "Element at " << i << " and " << j << " is " << singularValues.at<double>(i,j) << std::endl;
                         }
-
-                        //-- Get homography matrix
-                        homographyMatrix = cv::findHomography(obj,scene,RANSAC);
-
-                        //-- Get the corners from the image_1 ( the object to be "detected" )
-                        obj_corners[0] = cvPoint(0,0); obj_corners[1] = cvPoint(plant.cols, 0);
-                        obj_corners[2] = cvPoint(plant.cols, plant.rows); obj_corners[3] = cvPoint(0, plant.rows);
-
-                        cv::perspectiveTransform( obj_corners, scene_corners, homographyMatrix);
-
-                        //-- Draw lines between the corners (the mapped object in the scene - image_2 )
-                        cv::line( img_matches, scene_corners[0] + Point2f( plant.cols, 0), scene_corners[1] + Point2f( plant.cols, 0), Scalar(0, 255, 0), 4 );
-                        cv::line( img_matches, scene_corners[1] + Point2f( plant.cols, 0), scene_corners[2] + Point2f( plant.cols, 0), Scalar( 0, 255, 0), 4 );
-                        cv::line( img_matches, scene_corners[2] + Point2f( plant.cols, 0), scene_corners[3] + Point2f( plant.cols, 0), Scalar( 0, 255, 0), 4 );
-                        cv::line( img_matches, scene_corners[3] + Point2f( plant.cols, 0), scene_corners[0] + Point2f( plant.cols, 0), Scalar( 0, 255, 0), 4 );
-
-                        //-- Show detected matches
-                        //imshow( "Good Matches & Homography Calculation", img_matches );
-
-                        for( int i = 0; i < (int)good_matches.size(); i++ ){
-                            //printf( "-- Good Match [%d] Keypoint 1: %d  -- Keypoint 2: %d  \n", i, good_matches[i].queryIdx, good_matches[i].trainIdx );
-                        }
-
-                        std::cout << "Homography Matrix = " << std::endl << " " << homographyMatrix << std::endl;
-
-                        //-- Check determinant of the matrix to see if its too close to zero
-                        double HMDeterminant = cv::determinant(homographyMatrix);
-                        if (HMDeterminant>0.1) HMDFlag = 1;
-                        else HMDFlag = 0;
-                        std::cout << "Determinant of matrix is: " << HMDeterminant << std::endl;
-
-                        //-- DO SVD on homography matrix and check its values
-                        singularValues = cv::Mat();
-                        U, Vt = cv::Mat();
-                        CNFlag = 0;
-                        cv::SVDecomp(homographyMatrix, singularValues, U, Vt, 2);
-
-                        std::cout << "Printing the singular values of the homography matrix: " << std::endl;
-                        s = singularValues.size();
-                        rows = s.height;
-                        cols = s.width;
-                        for (int i = 0; i < rows; i++)
-                            for(int j = 0; j < cols; j++){
-                                std::cout << "Element at " << i << " and " << j << " is " << singularValues.at<double>(i,j) << std::endl;
-                            }
                         conditionNumber = singularValues.at<double>(0,0)/singularValues.at<double>(2,0);
                         std::cout << "Condition number is: " << conditionNumber << std::endl;
                         if(conditionNumber <= 10000000){
                             std::cout << "Condition number check passed" << std::endl;
                             CNFlag = 1;
                         }
-                    }
-                    if(CNFlag == 1 && HMDFlag == 1) seePlant = 1;
-                    if(seePlant == 1) break;
                 }
+                if(CNFlag == 1 && HMDFlag == 1) seePlant = 1;
+                if(seePlant == 1) break;
             }
-            if (bumperRelease == false && seePlant == false){
-                world_state = 2;
-            }
-            else if (bumperRelease == true && seePlant == false){
-                world_state = 0;
-            }
-            else if (seePlant == true){
+            
+            //Check if obstacle in front or see plant
+            ros::spinOnce();
+            if (seePlant == 1){
                 world_state = 3;
             }
-
-
-
-
+            else if(bumper.left == 1 || bumper.right == 1 || bumper.centre == 1){
+                world_state = 2;
+            }
 		}
+        //Check if Wall-E lost
 		else if(isLost()){
 			//When loose track of person
 			clock_t t = clock();
@@ -283,8 +290,10 @@ int main(int argc, char **argv)
 					break;
                 }
             }
+            //if still lost, look right for 4 seconds
 			if(foundPerson == false){
 				//Display almost crying
+                imshow("Display Window",sad1)
 
 				//look right for 4 seconds
 				t = clock();
@@ -302,72 +311,117 @@ int main(int argc, char **argv)
 					world_state = 4;
 			}
 		}
+        //0.If nothing sensed, keep following person
 		else{
 			//keep following person
 			world_state = 0;
 		}
 
-
-		//Emotion
+		//Wall-E Emotion Reactions
+        //0.Follow Person
 		if(world_state == 0){
-		//	fill with your code
 			vel_pub.publish(vel);
 			vel_pub.publish(follow_cmd);
-		//	ROS_INFO("follow_cmd = %d",follow_cmd);
-		        sleep(0.5);
+            //	ROS_INFO("follow_cmd = %d",follow_cmd);
+            
+            sleep(0.25);
 
-			sc.playWave(path_to_sounds+"sound.wav");
+			sc.playWave(path_to_sounds+"follow.wav");
 			sleep(1.0);
-
-			sc.stopWave(path_to_sounds+"sound.wav");
+			sc.stopWave(path_to_sounds+"follow.wav");
 
 		}
-      else if(world_state == 1){
-  			if (wheelLeft == 1 && wheelRight == 0){
+        //1.Suprised
+        else if(world_state == 1){
+            imshow("Display Window",sad);
+            if (wheelLeft == 1 && wheelRight == 0){
   				//tilted right suprised image
-  				sc.playWave(path_to_sounds+"alert.wav"); // change .wav file to suprised sound clip
+  				sc.playWave(path_to_sounds+"suprised.wav"); // change .wav file to suprised sound clip
   				sleep(1.0);
-          ROS_INFO("Left wheel is up");
+                ROS_INFO("Left wheel is up");
   			}
   			else if (wheelLeft == 0 && wheelRight == 1){
   				//tilted left suprised image
-  				sc.playWave(path_to_sounds+"alert.wav"); // change .wav file to suprised sound clip
+  				sc.playWave(path_to_sounds+"surprised.wav"); // change .wav file to suprised sound clip
   				sleep(1.0);
-          ROS_INFO("Right wheel is up");
+                ROS_INFO("Right wheel is up");
   			}
   			else if (wheelLeft == 1 && wheelRight == 1){
   				// normal suprised image
-          sc.playWave(path_to_sounds+"alert.wav"); // change .wav file to suprised sound clip
-          sleep(1.0);
-          sc.stopWave(path_to_sounds+"alert.wav");
-          ROS_INFO("Both wheels are up");
+                sc.playWave(path_to_sounds+"surprised.wav"); // change .wav file to suprised sound clip
+                sleep(1.0);
+                sc.stopWave(path_to_sounds+"surprised.wav");
+                ROS_INFO("Both wheels are up");
 			    clock_t t = clock();
-          while((clock()-t) < 3){
+                while((clock()-t) < 3){
   					vel.angular.x= -1;
   					vel_pub.publish(vel);
-            if (wheelLeft == 0 && wheelRight == 0)
-            break;
-          }
-  			}
-  			else if (wheelLeft == 0 && wheelRight == 0) {
+                    if (wheelLeft == 0 && wheelRight == 0)
+                        break;
+                }
+            }
+            else if (wheelLeft == 0 && wheelRight == 0) {
   				world_state = 0;
-  			}
-
-
+            }
 		}
+        //2.Angry
 		else if(world_state == 2){
+            //Display 'angry' Image
+            imshow("Display Window",angry);
+            
+            //Play Angry Sound
+            clock_t t = clock();
+            sc.playWave(path_to_sounds+"angry.wav");
+            
+            //Move back for 1 second
+            while((clock()-t) < 1){
+                vel.angular.x= -1;
+                vel.pub.publish(vel);
+            }
 
+            //Shake angrily 6 times.
+            for (int i = 1; i<=6; i++){
+                int j = -1;
+                while((clock()-t) < 0.5)
+                    vel.angular.z *= j;
+                vel.pub.publish(vel);
+            }
+            sc.stopWave(path_to_sounds+"angry.wav");
 		}
+        //3.Excited/Happy
 		else if(world_state == 3){
-
+            imshow("Display Window",happy);
+            clock_t t = clock();
+            //Display 'Happy' Image
+            sc.playWave(path_to_sounds+"happy.wav");
+            
+            
+            //Move back
+            while((clock()-t) < 1){
+                vel.angular.x= -1;
+                vel.pub.publish(vel);
+            }
+            
+            //Continuous rotation
+            while((clock()-t) < 5){
+                vel.angular.z =1;
+                vel.pub.publish(vel);
+            }
+            sc.stopWave(path_to_sounds+"happy.wav");
 		}
+        //4. Sad
 		else if(world_state ==4){
-			//Sad
 			//Display 'sad' image
+            cv::imshow("Display Window",sad);
 
 			//Play 'sad' sounds
-			//sc.playWave(path_to_sounds+"sad";
+            sc.playWave(path_to_sounds+"sad.wav");
+            sleep(2.0);
+            sc.stopWave(path_to_sounds+"sad.wav");
 		}
+        
+        //Reset to follow image
+        imshow("Display Window",follow);
 	}
 
 	return 0;
