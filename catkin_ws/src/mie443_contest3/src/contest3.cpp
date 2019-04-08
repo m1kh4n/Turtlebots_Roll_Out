@@ -17,6 +17,10 @@
 #include <iostream>
 #include <kobuki_msgs/WheelDropEvent.h>
 
+//For Debugging
+//#define STATE2AND3
+//#define STATE4
+
 using namespace std;
 using namespace cv;
 using namespace cv::xfeatures2d;
@@ -139,6 +143,7 @@ int main(int argc, char **argv)
 			world_state = 1;
 		}
         //2&3.Detect if Wall-E hit into something. Then check if plant or obstacle in front
+#ifdef STATE2AND3
 		else if(bumperState.left == 1 || bumperState.right == 1 || bumperState.centre == 1){
             clock_t t = clock();
             bool seePlant = false;
@@ -274,7 +279,9 @@ int main(int argc, char **argv)
                 world_state = 2;
             }
 		}
+#endif
         //Check if Wall-E lost
+#ifdef STATE4
 		else if(isLost()){
 			//When loose track of person
 			clock_t t = clock();
@@ -311,6 +318,7 @@ int main(int argc, char **argv)
 					world_state = 4;
 			}
 		}
+#endif
         //0.If nothing sensed, keep following person
 		else{
 			//keep following person
@@ -333,7 +341,7 @@ int main(int argc, char **argv)
 		}
         //1.Suprised
         else if(world_state == 1){
-            imshow("Display Window",surpised);
+            imshow("Display Window",surprised);
             if (wheelLeft == 1 && wheelRight == 0){
   				//tilted right suprised image
   				sc.playWave(path_to_sounds+"suprised.wav"); // change .wav file to suprised sound clip
@@ -365,6 +373,7 @@ int main(int argc, char **argv)
             }
 		}
         //2.Angry
+#ifdef STATE2AND3
 		else if(world_state == 2){
             //Display 'angry' Image
             imshow("Display Window",angry);
@@ -409,7 +418,9 @@ int main(int argc, char **argv)
             }
             sc.stopWave(path_to_sounds+"happy.wav");
 		}
+#endif
         //4. Sad
+#ifdef STATE4
 		else if(world_state ==4){
 			//Display 'sad' image
             cv::imshow("Display Window",sad2);
@@ -419,11 +430,12 @@ int main(int argc, char **argv)
             sleep(2.0);
             sc.stopWave(path_to_sounds+"sad.wav");
 		}
+#endif
         
-        //Reset to follow image
+        //Reset
         imshow("Display Window",follow);
+        world_state=0;
 	}
-
 	return 0;
 }
 
