@@ -126,9 +126,12 @@ int main(int argc, char **argv)
 	vel.angular.z = angular;
 	vel.linear.x = linear;
     
-    //Play startup sound
+    //Play startup sound and image
 	sc.playWave(path_to_sounds + "sound.wav");
 	ros::Duration(0.5).sleep();
+    cv::namedWindow("Display Window",WINDOW_AUTOSIZE);
+    cv::imshow("Display Window",angry);
+    cv::waitKey(30);
 
     //Turtlebot Operation Loop
 	while(ros::ok()){
@@ -333,10 +336,11 @@ int main(int argc, char **argv)
             //	ROS_INFO("follow_cmd = %d",follow_cmd);
             
             sleep(0.25);
-
+            /*
 			sc.playWave(path_to_sounds+"follow.wav");
-			sleep(1.0);
+			sleep(0.25);
 			sc.stopWave(path_to_sounds+"follow.wav");
+             */
 
 		}
         //1.Suprised
@@ -389,8 +393,8 @@ int main(int argc, char **argv)
             }
 
             //Shake angrily 6 times.
+            int j = -1;
             for (int i = 1; i<=6; i++){
-                int j = -1;
                 while((clock()-t) < 0.5)
                     vel.angular.z *= j;
                 vel_pub.publish(vel);
