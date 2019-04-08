@@ -143,6 +143,7 @@ int main(int argc, char **argv)
 		//Wall-E Senses
         //1. Detect if Wall-E picked up
 		if(wheelRight == 1 || wheelLeft == 1){
+            ROS_INFO("Help! I'm picked up");
 			world_state = 1;
 		}
         //2&3.Detect if Wall-E hit into something. Then check if plant or obstacle in front
@@ -276,9 +277,11 @@ int main(int argc, char **argv)
             //Check if obstacle in front or see plant
             ros::spinOnce();
             if (seePlant == 1){
+                ROS_INFO("See Plant");
                 world_state = 3;
             }
-            else if(bumperState.left == 1 || bumperState.right == 1 || bumperState.centre == 1){
+            else{
+                ROS_INFO("Obstacle Ahead");
                 world_state = 2;
             }
 		}
@@ -317,8 +320,10 @@ int main(int argc, char **argv)
 					}
 				}
 				//if still can't find person, do world_state 4 emotion
-				if(foundPerson == false)
+                if(foundPerson == false){
+                    ROS_INFO("I'm Lost");
 					world_state = 4;
+                }
 			}
 		}
 #endif
@@ -345,6 +350,7 @@ int main(int argc, char **argv)
 		}
         //1.Suprised
         else if(world_state == 1){
+            ROS_INFO("Surprised");
             imshow("Display Window",surprised);
             if (wheelLeft == 1 && wheelRight == 0){
   				//tilted right suprised image
@@ -379,6 +385,7 @@ int main(int argc, char **argv)
         //2.Angry
 #ifdef STATE2AND3
 		else if(world_state == 2){
+            ROS_INFO("Angry");
             //Display 'angry' Image
             imshow("Display Window",angry);
             
@@ -403,6 +410,7 @@ int main(int argc, char **argv)
 		}
         //3.Excited/Happy
 		else if(world_state == 3){
+            ROS_INFO("Happy");
             imshow("Display Window",happy);
             clock_t t = clock();
             //Display 'Happy' Image
@@ -426,6 +434,7 @@ int main(int argc, char **argv)
         //4. Sad
 #ifdef STATE4
 		else if(world_state ==4){
+            ROS_INFO("Sad");
 			//Display 'sad' image
             cv::imshow("Display Window",sad2);
 
