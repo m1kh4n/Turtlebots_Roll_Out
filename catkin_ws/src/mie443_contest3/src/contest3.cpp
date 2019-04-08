@@ -32,7 +32,7 @@ int world_state;
 
 //Load Images
 cv::Mat follow = imread("/filepath",CV_LOAD_IMAGE_COLOR);
-cv::Mat suprised = imread("/filepath",CV_LOAD_IMAGE_COLOR);
+cv::Mat surprised = imread("/filepath",CV_LOAD_IMAGE_COLOR);
 cv::Mat angry = imread("/filepath",CV_LOAD_IMAGE_COLOR);
 cv::Mat happy = imread("/filepath",CV_LOAD_IMAGE_COLOR);
 cv::Mat sad1 = imread("/filepath",CV_LOAD_IMAGE_COLOR);
