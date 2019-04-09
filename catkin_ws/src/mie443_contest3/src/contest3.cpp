@@ -64,8 +64,8 @@ bool wheelRight = 0;
 bool wheelLeft=0;
 
 void wheeldropCB(const kobuki_msgs::WheelDropEvent::ConstPtr msg){
-	/*if (msg-> state == 1){
-        if (msg-> wheeldrop == 1){
+	if (msg-> state == 1){
+        if (msg-> wheel == 1){
             wheelRight = 1;
         }
         else if (msg-> wheel == 0){
@@ -80,11 +80,10 @@ void wheeldropCB(const kobuki_msgs::WheelDropEvent::ConstPtr msg){
             wheelLeft = 0;
         }
     }
-    */
-    if (msg-> wheel_drop == 1){
-    	wheelRight = !wheelRight;
-    	wheelLeft = !wheelLeft;
-    }
+    std::cout<<"wheel Right: "<<wheelRight<<std::endl;
+
+    std::cout<<"wheel Left: "<<wheelLeft<<std::endl;
+    //ROS_INFO("wheelRight: %d, wheelLeft: %d",wheelRight, wheelLeft);
 }
 
 //Helper Functions
@@ -112,7 +111,9 @@ int main(int argc, char **argv)
 	//Initialize Subscribers
 	ros::Subscriber follower = nh.subscribe("follower_velocity_smoother/smooth_cmd_vel", 10, &followerCB);
 	ros::Subscriber bumper = nh.subscribe("mobile_base/events/bumper", 10, &bumperCB);
-    ros::Subscriber wheeldrop = nh.subscribe("mobile_base/events/wheeldrop",10,&wheeldropCB);
+    ros::Subscriber wheeldrop = nh.subscribe("mobile_base/events/wheel_drop",10,&wheeldropCB);
+    
+    ros::spin();
 
     //Initialize imageTransport and imagePipeline
 	imageTransporter rgbTransport("camera/image/", sensor_msgs::image_encodings::BGR8); //--for Webcam
