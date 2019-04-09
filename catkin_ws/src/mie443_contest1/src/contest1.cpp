@@ -200,7 +200,7 @@ int main(int argc, char **argv)
 	ros::NodeHandle nh;
 	teleController eStop;
     
-    	ros::Subscriber odom = nh.subscribe("/odom", 1, odomCallback);
+    ros::Subscriber odom = nh.subscribe("/odom", 1, odomCallback);
 	ros::Subscriber bumper_sub = nh.subscribe("mobile_base/events/bumper", 10, &bumperCallback);
 	ros::Subscriber laser_sub = nh.subscribe("scan", 10, &laserCallback);
 
