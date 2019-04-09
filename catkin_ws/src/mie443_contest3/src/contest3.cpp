@@ -122,7 +122,7 @@ int main(int argc, char **argv)
 	ImagePipeline imagePipeline(nh);
 
     //Initialize Variables at Startup
-	int world_state = 0;
+    int world_state = 0;
 
 	double angular = 0.2;
 	double linear = 0.0;
@@ -311,7 +311,8 @@ int main(int argc, char **argv)
             //if still lost, look right for 4 seconds
 			if(foundPerson == false){
 				//Display almost crying
-                imshow("Display Window",sad1);
+                cv::imshow("Display Window",sad1);
+                cv::waitKey(30);
 
 				//look right for 4 seconds
 				t = clock();
@@ -356,7 +357,8 @@ int main(int argc, char **argv)
         //1.Suprised
         else if(world_state == 1){
             ROS_INFO("Surprised");
-            imshow("Display Window",surprised);
+            cv::imshow("Display Window",surprised);
+            cv::waitKey(30);
             if (wheelLeft == 1 && wheelRight == 0){
   				//tilted right suprised image
   				sc.playWave(path_to_sounds+"suprised.wav"); // change .wav file to suprised sound clip
@@ -392,7 +394,8 @@ int main(int argc, char **argv)
 		else if(world_state == 2){
             ROS_INFO("Angry");
             //Display 'angry' Image
-            imshow("Display Window",angry);
+            cv::imshow("Display Window",angry);
+            cv::waitKey(30);
             
             //Play Angry Sound
             clock_t t = clock();
@@ -416,7 +419,8 @@ int main(int argc, char **argv)
         //3.Excited/Happy
 		else if(world_state == 3){
             ROS_INFO("Happy");
-            imshow("Display Window",happy);
+            cv::imshow("Display Window",happy);
+            cv::waitKey(30);
             clock_t t = clock();
             //Display 'Happy' Image
             sc.playWave(path_to_sounds+"happy.wav");
@@ -442,6 +446,7 @@ int main(int argc, char **argv)
             ROS_INFO("Sad");
 			//Display 'sad' image
             cv::imshow("Display Window",sad2);
+            cv::waitKey(30);
 
 			//Play 'sad' sounds
             sc.playWave(path_to_sounds+"sad.wav");
@@ -451,7 +456,8 @@ int main(int argc, char **argv)
 #endif
         
         //Reset
-        imshow("Display Window",follow);
+        cv::imshow("Display Window",follow);
+        cv::waitKey(30);
         world_state=0;
 	}
 	return 0;
