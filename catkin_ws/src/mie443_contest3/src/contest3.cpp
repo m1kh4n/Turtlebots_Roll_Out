@@ -64,8 +64,8 @@ bool wheelRight = 0;
 bool wheelLeft=0;
 
 void wheeldropCB(const kobuki_msgs::WheelDropEvent::ConstPtr msg){
-	if (msg-> state == 1){
-        if (msg-> wheel == 1){
+	/*if (msg-> state == 1){
+        if (msg-> wheeldrop == 1){
             wheelRight = 1;
         }
         else if (msg-> wheel == 0){
@@ -79,6 +79,11 @@ void wheeldropCB(const kobuki_msgs::WheelDropEvent::ConstPtr msg){
         else if (msg-> wheel == 0){
             wheelLeft = 0;
         }
+    }
+    */
+    if (msg-> wheel_drop == 1){
+    	wheelRight = !wheelRight;
+    	wheelLeft = !wheelLeft;
     }
 }
 
